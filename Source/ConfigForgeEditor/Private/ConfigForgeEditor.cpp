@@ -112,6 +112,18 @@ TSharedRef<FSlateStyleSet> FConfigForgeEditorModule::Create() const
 	style->Set("ClassIcon.StringConfigObject",
 		new FSlateImageBrush(style->RootToContentDir(TEXT("StringConfigObject16.png")), icon16));
 
+	style->Set("ClassThumbnail.ConfigForgeSetup",
+		new FSlateImageBrush(style->RootToContentDir(TEXT("ConfigForgeSetup128.png")), icon128));
+
+	style->Set("ClassIcon.ConfigForgeSetup",
+		new FSlateImageBrush(style->RootToContentDir(TEXT("ConfigForgeSetup16.png")), icon16));
+
+	style->Set("ClassThumbnail.ConfigPathProvider",
+		new FSlateImageBrush(style->RootToContentDir(TEXT("ConfigPathProvider128.png")), icon128));
+
+	style->Set("ClassIcon.ConfigPathProvider",
+		new FSlateImageBrush(style->RootToContentDir(TEXT("ConfigPathProvider16.png")), icon16));
+
 	return style;
 }
 

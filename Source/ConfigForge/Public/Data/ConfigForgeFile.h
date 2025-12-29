@@ -28,6 +28,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Config File")
 	EConfigFileType FileType;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="File Data")
+	FString FileName;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category="Config File")
 	TArray<UConfigForgeCategory*> Categories;
 };

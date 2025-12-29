@@ -16,6 +16,9 @@ class CONFIGFORGE_API UConfigValueObject : public UObject
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data")
+	FString Key;
 
-	
+public:
+
 };
