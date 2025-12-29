@@ -22,7 +22,9 @@ public class ConfigForgeEditor : ModuleRules
 				"SlateCore",
 				"GameplayTagsEditor",
 				"GameplayTags",
-				"UMG"
+				"UMG",
+				"Projects",
+				"UnrealEd"
 			}
 		);
 	}
