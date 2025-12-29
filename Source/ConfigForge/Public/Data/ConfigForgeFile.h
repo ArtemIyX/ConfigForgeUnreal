@@ -1,0 +1,33 @@
+﻿// © Artem Podorozhko. All Rights Reserved. This project, including all associated assets, code, and content, is the property of Artem Podorozhko. Unauthorized use, distribution, or modification is strictly prohibited.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "UObject/Object.h"
+#include "ConfigForgeFile.generated.h"
+
+class UConfigForgeCategory;
+
+UENUM(Blueprintable, BlueprintType)
+enum class EConfigFileType : uint8
+{
+	Ini,
+	Binary
+};
+
+
+UCLASS(Blueprintable, BlueprintType)
+class CONFIGFORGE_API UConfigForgeFile : public UObject
+{
+	GENERATED_BODY()
+
+public:
+	UConfigForgeFile(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Config File")
+	EConfigFileType FileType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category="Config File")
+	TArray<UConfigForgeCategory*> Categories;
+};

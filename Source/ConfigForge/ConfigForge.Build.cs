@@ -38,6 +38,10 @@ public class ConfigForge : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"DeveloperSettings",
+				"GameplayTags",
+				"GameplayTagsEditor",
+				"UMG",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
