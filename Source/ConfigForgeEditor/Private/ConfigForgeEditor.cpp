@@ -1,11 +1,25 @@
 ﻿#include "ConfigForgeEditor.h"
 
+#include "AssetToolsModule.h"
+#include "Factories/AssetTypeActions_ConfigSetup.h"
+#include "Factories/AssetTypeActions_PathProvider.h"
 #include "Interfaces/IPluginManager.h"
 #include "Styling/SlateStyleRegistry.h"
 
 TSharedPtr<FSlateStyleSet> FConfigForgeEditorModule::StyleSet;
 
 #define LOCTEXT_NAMESPACE "FConfigForgeEditorModule"
+
+void FConfigForgeEditorModule::UnregisterAssetActions()
+{
+	IAssetTools& assetTools = IAssetTools::Get();
+	const int32 n = AssetActions.Num();
+	for (int32 i = 0; i < n; ++i)
+	{
+		assetTools.UnregisterAssetTypeActions(AssetActions[i].ToSharedRef());
+	}
+	AssetActions.Empty();
+}
 
 void FConfigForgeEditorModule::StartupModule()
 {
@@ -16,6 +30,11 @@ void FConfigForgeEditorModule::StartupModule()
 			StyleSet = Create();
 			FSlateStyleRegistry::RegisterSlateStyle(*StyleSet.Get());
 		}
+
+		IAssetTools& assetTools = IAssetTools::Get();
+		assetTools.RegisterAdvancedAssetCategory(FName(TEXT("Config")), FText::FromString(TEXT("Config Forge")));
+		RegisterAssetActions<FAssetTypeActions_PathProvider>(assetTools);
+		RegisterAssetActions<FAssetTypeActions_ConfigSetup>(assetTools);
 	}
 }
 
@@ -28,6 +47,7 @@ void FConfigForgeEditorModule::ShutdownModule()
 			FSlateStyleRegistry::UnRegisterSlateStyle(*StyleSet.Get());
 			StyleSet.Reset();
 		}
+		UnregisterAssetActions();
 	}
 }
 

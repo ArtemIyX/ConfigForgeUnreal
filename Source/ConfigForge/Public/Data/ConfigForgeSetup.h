@@ -15,6 +15,10 @@ struct CONFIGFORGE_API FConfigForgeFileData
 	GENERATED_BODY()
 
 public:
+	FConfigForgeFileData()
+		: File(nullptr) {}
+
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="File Data")
 	TSubclassOf<UConfigPathProvider> PathProvider;
 	

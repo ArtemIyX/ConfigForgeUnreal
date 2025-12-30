@@ -20,11 +20,12 @@ public class ConfigForgeEditor : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"UnrealEd",
+				"Projects",
+				"AssetTools", 
 				"GameplayTagsEditor",
 				"GameplayTags",
-				"UMG",
-				"Projects",
-				"UnrealEd"
+				"UMG"
 			}
 		);
 	}
