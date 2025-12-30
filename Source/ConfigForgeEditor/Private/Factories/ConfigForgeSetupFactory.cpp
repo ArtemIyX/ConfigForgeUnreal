@@ -11,3 +11,8 @@ UConfigForgeSetupFactory::UConfigForgeSetupFactory()
 	bEditAfterNew = true;
 	SupportedClass = UConfigForgeSetup::StaticClass();
 }
+
+UObject* UConfigForgeSetupFactory::FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn, FName CallingContext)
+{
+	return NewObject<UConfigForgeSetup>(InParent, SupportedClass, InName, Flags);
+}
