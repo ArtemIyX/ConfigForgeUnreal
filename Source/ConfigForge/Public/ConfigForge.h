@@ -4,6 +4,8 @@
 
 #include "Modules/ModuleManager.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogConfigForge, All, All);
+
 class FConfigForgeModule : public IModuleInterface
 {
 public:

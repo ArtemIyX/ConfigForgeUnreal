@@ -4,6 +4,8 @@
 
 #define LOCTEXT_NAMESPACE "FConfigForgeModule"
 
+DEFINE_LOG_CATEGORY(LogConfigForge);
+
 void FConfigForgeModule::StartupModule() {}
 
 void FConfigForgeModule::ShutdownModule() {}

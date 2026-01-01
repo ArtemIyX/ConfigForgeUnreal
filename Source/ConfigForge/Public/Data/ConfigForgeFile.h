@@ -25,12 +25,14 @@ public:
 	UConfigForgeFile(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EConfigFileType FileType;*/
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString FileName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced)
 	TArray<TObjectPtr<UConfigForgeCategory>> Categories;
+
+public:
+	UFUNCTION(BlueprintCallable, Category="File")
+	bool GetCategory(const FName& InCategoryName, UConfigForgeCategory*& OutCategory) const;
 };
