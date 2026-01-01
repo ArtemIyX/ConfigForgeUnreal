@@ -8,15 +8,15 @@
 
 class UConfigForgeCategory;
 
-UENUM(Blueprintable, BlueprintType)
+/*UENUM(Blueprintable, BlueprintType)
 enum class EConfigFileType : uint8
 {
 	Ini,
 	Binary
-};
+};*/
 
 
-UCLASS(Blueprintable, BlueprintType)
+UCLASS(Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNew)
 class CONFIGFORGE_API UConfigForgeFile : public UObject
 {
 	GENERATED_BODY()
@@ -25,12 +25,12 @@ public:
 	UConfigForgeFile(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Config File")
-	EConfigFileType FileType;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EConfigFileType FileType;*/
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="File Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString FileName;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category="Config File")
-	TArray<UConfigForgeCategory*> Categories;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced)
+	TArray<TObjectPtr<UConfigForgeCategory>> Categories;
 };

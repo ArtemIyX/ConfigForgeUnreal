@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "UObject/Object.h"
 #include "ConfigForgeSetup.generated.h"
 
@@ -15,15 +16,14 @@ struct CONFIGFORGE_API FConfigForgeFileData
 	GENERATED_BODY()
 
 public:
-	FConfigForgeFileData()
-		: File(nullptr) {}
+	FConfigForgeFileData();
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="File Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, NoClear, Category="File Data")
 	TSubclassOf<UConfigPathProvider> PathProvider;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category="File Data")
-	UConfigForgeFile* File;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, meta=(ShowOnlyInnerProperties), Category="File Data")
+	TObjectPtr<UConfigForgeFile> File;
 };
 
 /**
@@ -38,6 +38,6 @@ public:
 	UConfigForgeSetup(const FObjectInitializer& InObjectInitializer = FObjectInitializer::Get());
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settigns")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ShowOnlyInnerProperties), Category = "Settigns")
 	TArray<FConfigForgeFileData> Files;
 };

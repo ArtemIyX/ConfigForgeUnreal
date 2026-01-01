@@ -3,7 +3,14 @@
 
 #include "Data/ConfigForgeSetup.h"
 
-UConfigForgeSetup::UConfigForgeSetup(const FObjectInitializer& InObjectInitializer) : Super(InObjectInitializer)
+#include "Data/ConfigPathProvider.h"
+
+FConfigForgeFileData::FConfigForgeFileData()
 {
-	
+	File = nullptr;
+	PathProvider = UConfigPathProvider::StaticClass();
+
 }
+
+UConfigForgeSetup::UConfigForgeSetup(const FObjectInitializer& InObjectInitializer)
+	: Super(InObjectInitializer) {}

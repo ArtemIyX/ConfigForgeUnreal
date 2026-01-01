@@ -9,7 +9,7 @@
 
 class UConfigValueObject;
 
-UCLASS(Blueprintable, BlueprintType)
+UCLASS(Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNew)
 class CONFIGFORGE_API UConfigForgeCategory : public UObject
 {
 	GENERATED_BODY()
@@ -21,6 +21,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Category Name", Category = "Category")
 	FName Name;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Category Properties", Category = "Category")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, meta=(ShowOnlyInnerProperties), DisplayName="Category Properties", Category = "Category")
 	TArray<UConfigValueObject*> Fields;
 };
