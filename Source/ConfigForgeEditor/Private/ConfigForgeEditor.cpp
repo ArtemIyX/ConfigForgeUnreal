@@ -1,9 +1,11 @@
 ﻿#include "ConfigForgeEditor.h"
 
 #include "AssetToolsModule.h"
+#include "EdGraphUtilities.h"
 #include "Factories/AssetTypeActions_ConfigSetup.h"
 #include "Factories/AssetTypeActions_PathProvider.h"
 #include "Interfaces/IPluginManager.h"
+#include "K2/StringListPinFactory.h"
 #include "Styling/SlateStyleRegistry.h"
 
 TSharedPtr<FSlateStyleSet> FConfigForgeEditorModule::StyleSet;
@@ -21,6 +23,16 @@ void FConfigForgeEditorModule::UnregisterAssetActions()
 	AssetActions.Empty();
 }
 
+void FConfigForgeEditorModule::UnregisterPinFactories()
+{
+	const int32 n = PinFactories.Num();
+	for (int32 i = 0; i < n; ++i)
+	{
+		FEdGraphUtilities::UnregisterVisualPinFactory(PinFactories[i]);
+	}
+	PinFactories.Empty();
+}
+
 void FConfigForgeEditorModule::StartupModule()
 {
 	if (GEditor)
@@ -35,6 +47,8 @@ void FConfigForgeEditorModule::StartupModule()
 		assetTools.RegisterAdvancedAssetCategory(FName(TEXT("Config")), FText::FromString(TEXT("Config Forge")));
 		RegisterAssetActions<FAssetTypeActions_PathProvider>(assetTools);
 		RegisterAssetActions<FAssetTypeActions_ConfigSetup>(assetTools);
+		
+		RegisterPinFactory<FStringListPinFactory>();
 	}
 }
 
@@ -48,6 +62,7 @@ void FConfigForgeEditorModule::ShutdownModule()
 			StyleSet.Reset();
 		}
 		UnregisterAssetActions();
+		UnregisterPinFactories();
 	}
 }
 

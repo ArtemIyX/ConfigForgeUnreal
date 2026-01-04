@@ -42,6 +42,12 @@ public class ConfigForge : ModuleRules
 				"GameplayTags",
 				"GameplayTagsEditor",
 				"UMG",
+				"EditorStyle",
+				"UnrealEd",
+				"BlueprintGraph",
+				"Kismet",
+				"KismetCompiler",
+				"InputCore",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

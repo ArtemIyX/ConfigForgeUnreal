@@ -149,6 +149,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Get|File")
 	void GetFiles(TArray<FConfigForgeFileData>& OutFiles) const;
 
+	static void GetFilesStatic(UConfigForgeSetup* InSetupFile, TArray<FConfigForgeFileData>& OutFiles);
+
 	/**
 	 * @brief Retrieves the names of all configuration files in the setup asset.
 	 * 

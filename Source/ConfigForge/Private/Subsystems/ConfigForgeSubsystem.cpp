@@ -46,23 +46,28 @@ bool UConfigForgeSubsystem::GetFile(const FString& InFileName, FConfigForgeFileD
 
 void UConfigForgeSubsystem::GetFiles(TArray<FConfigForgeFileData>& OutFiles) const
 {
+	GetFilesStatic(GetSetupAsset().LoadSynchronous(), OutFiles);
+}
+
+void UConfigForgeSubsystem::GetFilesStatic(UConfigForgeSetup* InSetupFile, TArray<FConfigForgeFileData>& OutFiles)
+{
 	OutFiles.Empty();
-	UConfigForgeSetup* setup = GetSetupAsset().LoadSynchronous();
-	if (setup == nullptr)
+
+	if (InSetupFile == nullptr)
 	{
 		UE_LOG(LogConfigForge, Error, TEXT("%hs %d Setup asset is invalid. Please select asset in Project Settings -> Config Forge -> 'ConfigSetup'"),
 			__FUNCTION__, __LINE__);
 		return;
 	}
 
-	if (setup->Files.IsEmpty())
+	if (InSetupFile->Files.IsEmpty())
 	{
 		UE_LOG(LogConfigForge, Warning, TEXT("%hs %d Setup Asset has no files"),
 			__FUNCTION__, __LINE__);
 		return;
 	}
 
-	const TArray<FConfigForgeFileData>& arr = setup->Files;
+	const TArray<FConfigForgeFileData>& arr = InSetupFile->Files;
 	const int32 n = arr.Num();
 	OutFiles.Reserve(n);
 	for (int32 i = 0; i < n; ++i)
@@ -72,7 +77,6 @@ void UConfigForgeSubsystem::GetFiles(TArray<FConfigForgeFileData>& OutFiles) con
 			OutFiles.Add(arr[i]);
 		}
 	}
-	/*OutFiles = setup->Files;*/
 }
 
 void UConfigForgeSubsystem::GetFileNames(TArray<FString>& OutNames) const

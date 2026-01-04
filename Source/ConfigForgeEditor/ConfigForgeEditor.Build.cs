@@ -9,7 +9,7 @@ public class ConfigForgeEditor : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", "ConfigForge"
+				"Core", "ConfigForge", "Engine"
 			}
 		);
 
@@ -17,12 +17,18 @@ public class ConfigForgeEditor : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
-				"Engine",
+				"BlueprintGraph",
+				"PropertyEditor",
+				"EditorStyle",
+				"Kismet",
+				"KismetCompiler",
+				"InputCore",
+				"GraphEditor",
 				"Slate",
 				"SlateCore",
 				"UnrealEd",
 				"Projects",
-				"AssetTools", 
+				"AssetTools",
 				"GameplayTagsEditor",
 				"GameplayTags",
 				"UMG"
