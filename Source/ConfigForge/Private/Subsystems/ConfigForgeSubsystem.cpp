@@ -7,10 +7,15 @@
 #include "Misc/ConfigForgeDeveloperSettings.h"
 #include "Data/ConfigForgeCategory.h"
 #include "Data/ConfigForgeFile.h"
+#include "Data/ConfigForgeFileRuntime.h"
 #include "Data/ConfigForgeSetup.h"
+#include "Data/ConfigPathProvider.h"
 #include "Data/Value/ConfigValueObject.h"
 
+
 UConfigForgeSubsystem::UConfigForgeSubsystem() {}
+
+#pragma region Get
 
 const UConfigForgeDeveloperSettings* UConfigForgeSubsystem::GetSettings() const
 {
@@ -117,20 +122,6 @@ void UConfigForgeSubsystem::GetFileCategoriesByName(const FString& InFileName, T
 {
 	OutCategories.Empty();
 
-	/*TArray<FConfigForgeFileData> files;
-	GetFiles(files);
-	const int32 n = files.Num();
-	for (int32 i = 0; i < n; ++i)
-	{
-		if (files[i].File != nullptr)
-		{
-			if (files[i].File->FileName == InFileName)
-			{
-				
-				return;
-			}
-		}
-	}*/
 	FConfigForgeFileData fileData;
 	if (!GetFile(InFileName, fileData))
 	{
@@ -205,4 +196,151 @@ void UConfigForgeSubsystem::GetCategoryProperties(const FString& InFileName, con
 			OutProperties.Add(arr[i]);
 		}
 	}
+}
+
+#pragma endregion
+
+
+bool UConfigForgeSubsystem::LoadFileInternal(TSubclassOf<UConfigPathProvider> InPathProviderClass, const FGuid& InId, UConfigForgeFile* InTemplate, UConfigForgeFileRuntime*& OutFile)
+{
+	OutFile = nullptr;
+	if (!InTemplate)
+		return false;
+
+	if (!InPathProviderClass)
+		return false;
+
+	UConfigPathProvider* pathProvider = NewObject<UConfigPathProvider>(this, InPathProviderClass);
+	if (!pathProvider)
+		return false;
+
+	const FString directoryPath = pathProvider->GetPath();
+	IPlatformFile& platformFile = FPlatformFileManager::Get().GetPlatformFile();
+
+	UE_LOG(LogConfigForge, Log, TEXT("%hs %s Loading file '%s'..."), __FUNCTION__,
+		*GetNameSafe(pathProvider->GetClass()), *directoryPath);
+
+	if (!platformFile.DirectoryExists(*directoryPath))
+	{
+		UE_LOG(LogConfigForge, Warning, TEXT("%hs Path provider '%s' directory '%s' doesnt exist, trying to create it..."), __FUNCTION__,
+			*GetNameSafe(pathProvider->GetClass()), *directoryPath);
+		const bool bCreated = platformFile.CreateDirectoryTree(*directoryPath);
+		if (!bCreated)
+		{
+			UE_LOG(LogConfigForge, Error, TEXT("%hs Path provider '%s' failed to create directory '%s'"), __FUNCTION__,
+				*GetNameSafe(pathProvider->GetClass()),
+				*directoryPath);
+			pathProvider->ConditionalBeginDestroy();
+			pathProvider = nullptr;
+			return false;
+		}
+	}
+
+	const FString fileName = InTemplate->FileName;
+	FString filePath = directoryPath / fileName;
+	if (FPaths::IsRelative(filePath))
+	{
+		filePath = FPaths::ConvertRelativePathToFull(filePath);
+	}
+
+	UConfigForgeFileRuntime* runtimeFile = NewObject<UConfigForgeFileRuntime>(this);
+
+	runtimeFile->SetPathProvider(pathProvider);
+	runtimeFile->SetFileAsset(InTemplate);
+	runtimeFile->SetFileName(fileName);
+	runtimeFile->SetFullPath(filePath);
+	runtimeFile->SetFileID(InId);
+
+	// Put default values
+	runtimeFile->InitDefaultData();
+
+	// Remove previous object if necessary
+	if (RuntimeFiles.Contains(InId))
+	{
+		TObjectPtr<UConfigForgeFileRuntime>& filePtr = RuntimeFiles[InId];
+		if (filePtr != nullptr)
+		{
+			filePtr->ConditionalBeginDestroy();
+		}
+		RuntimeFiles[InId] = nullptr;
+		RuntimeFiles.Remove(InId);
+	}
+
+	if (!platformFile.FileExists(*directoryPath))
+	{
+		UE_LOG(LogConfigForge, Warning, TEXT("%hs Path provider '%s', file '%s' doesnt exist, trying to create default file"), __FUNCTION__,
+			*GetNameSafe(pathProvider->GetClass()), *filePath);
+
+		// Create default file
+		runtimeFile->SaveTo(filePath);
+	}
+
+	UE_LOG(LogConfigForge, Log, TEXT("%hs %s Reading file '%s'..."), __FUNCTION__,
+		*GetNameSafe(pathProvider->GetClass()), *filePath);
+
+	// Read all possible data from file
+	if (runtimeFile->ReadFrom(filePath))
+	{
+		UE_LOG(LogConfigForge, Log, TEXT("%hs %s File '%s has been reed successfully!"), __FUNCTION__,
+			*GetNameSafe(pathProvider->GetClass()), *filePath);
+	}
+	else
+	{
+		UE_LOG(LogConfigForge, Warning, TEXT("%hs %s File '%s failed to read correctly; trying to save to make default view"), __FUNCTION__,
+			*GetNameSafe(pathProvider->GetClass()), *filePath);
+		// Write everything else to file
+		runtimeFile->SaveTo(filePath);
+	}
+
+	// Store file object in map
+	RuntimeFiles.Add(InId, runtimeFile);
+
+	OutFile = runtimeFile;
+
+	return true;
+}
+
+bool UConfigForgeSubsystem::LoadSingleFile(const FConfigForgeFileData& InFileData, UConfigForgeFileRuntime*& OutFile)
+{
+	OutFile = nullptr;
+
+	if (bLoadingFiles)
+		return false;
+
+	bLoadingFiles = true;
+
+	bool bLoaded = LoadFileInternal(InFileData.PathProvider, InFileData.ID(), InFileData.File.Get(), OutFile);
+
+	bLoadingFiles = false;
+
+	return bLoaded;
+}
+
+void UConfigForgeSubsystem::LoadSingleFileAsync(const FConfigForgeFileData& InFileData, FLoadForgeFileDelegate Callback)
+{
+	if (bLoadingFiles)
+	{
+		Callback.ExecuteIfBound(false, nullptr);
+		return;
+	}
+
+	bLoadingFiles = true;
+
+	Async(EAsyncExecution::TaskGraph, [this, InFileData, Callback]() {
+		UConfigForgeFileRuntime* runtimeFile;
+		const bool bLoaded = LoadFileInternal(InFileData.PathProvider, InFileData.ID(), InFileData.File.Get(), runtimeFile);
+		bLoadingFiles = false;
+		if (bLoaded && runtimeFile != nullptr)
+		{
+			AsyncTask(ENamedThreads::GameThread, [this, runtimeFile, Callback]() {
+				Callback.ExecuteIfBound(true, runtimeFile);
+			});
+		}
+		else
+		{
+			AsyncTask(ENamedThreads::GameThread, [this, Callback]() {
+				Callback.ExecuteIfBound(false, nullptr);
+			});
+		}
+	});
 }

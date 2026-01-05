@@ -24,6 +24,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, meta=(ShowOnlyInnerProperties), Category="File Data")
 	TObjectPtr<UConfigForgeFile> File;
+
+public:
+	FGuid ID() const;
+	static FGuid MakeID(const FConfigForgeFileData& InFileData);
 };
 
 /**

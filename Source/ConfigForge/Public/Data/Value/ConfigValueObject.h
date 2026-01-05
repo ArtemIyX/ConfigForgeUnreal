@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Misc/ConfigForgeIniFile.h"
 #include "UObject/Object.h"
 #include "ConfigValueObject.generated.h"
 
@@ -20,5 +21,12 @@ public:
 	FString Key;
 
 public:
+	
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection);
 
+	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection);
+
+	virtual uint32 MakeHash() const;
 };

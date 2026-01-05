@@ -35,4 +35,8 @@ public:
 public:
 	UFUNCTION(BlueprintCallable, Category="File")
 	bool GetCategory(const FName& InCategoryName, UConfigForgeCategory*& OutCategory) const;
+
+public:
+
+	uint32 MakeHash() const;
 };

@@ -14,7 +14,7 @@ bool UConfigForgeLibrary::GetConfigForgeFile(const UObject* WorldContextObject, 
 		UE_LOG(LogConfigForge, Error, TEXT("%hs %d GetConfigForgeFile: WorldContextObject is null"), __FUNCTION__, __LINE__);
 		return false;
 	}
-	
+
 	// Get the world from the context object
 	UWorld* world = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
 	if (!world)
@@ -41,4 +41,9 @@ bool UConfigForgeLibrary::GetConfigForgeFile(const UObject* WorldContextObject, 
 
 	// Call the actual GetFile function
 	return subsystem->GetFile(InFileName, OutFileData);
+}
+
+FGuid UConfigForgeLibrary::GetForgeFileID(const FConfigForgeFileData& InData)
+{
+	return FConfigForgeFileData::MakeID(InData);
 }

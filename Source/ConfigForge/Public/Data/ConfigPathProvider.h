@@ -18,6 +18,13 @@ public:
 	UConfigPathProvider(const FObjectInitializer& InObjectInitializer = FObjectInitializer::Get());
 
 public:
+	/**
+	 * 
+	 * @return Path to DIRECTORY (Folder)
+	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, BlueprintPure, Category="ConfigPathProvider")
 	FString GetPath() const;
+
+public:
+
 };

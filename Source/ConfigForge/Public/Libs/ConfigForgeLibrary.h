@@ -27,4 +27,8 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="ConfigForge", DisplayName="Get Config Forge File (Static Lib)", meta=(WorldContext="WorldContextObject"))
 	static bool GetConfigForgeFile(const UObject* WorldContextObject, const FString& InFileName, FConfigForgeFileData& OutFileData);
+
+	UFUNCTION(BlueprintCallable, Category="ConfigForge", DisplayName="Get Config Forge File GUID (Static Lib)")
+	static FGuid GetForgeFileID(const FConfigForgeFileData& InData);
+	
 };

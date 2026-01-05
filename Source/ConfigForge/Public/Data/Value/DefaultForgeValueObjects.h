@@ -17,7 +17,10 @@ public:
 	bool bValue;
 
 public:
-
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection) override;
+	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection) override;
+	virtual uint32 MakeHash() const override;
 };
 
 UCLASS(Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNew)
@@ -30,7 +33,10 @@ public:
 	float FloatValue;
 
 public:
-
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection) override;
+	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection) override;
+	virtual uint32 MakeHash() const override;
 };
 
 UCLASS(Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNew)
@@ -43,7 +49,10 @@ public:
 	double DoubleValue;
 
 public:
-
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection) override;
+	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection) override;
+	virtual uint32 MakeHash() const override;
 };
 
 UCLASS(Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNew)
@@ -55,7 +64,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=2), Category="Data")
 	int32 IntValue;
 
-
+public:
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection) override;
+	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection) override;
+	virtual uint32 MakeHash() const override;
 };
 
 UCLASS(Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNew)
@@ -66,6 +79,12 @@ class CONFIGFORGE_API UInt64ConfigObject : public UConfigValueObject
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=2), Category="Data")
 	int64 Int64Value;
+
+public:
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection) override;
+	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection) override;
+	virtual uint32 MakeHash() const override;
 };
 
 UCLASS(Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNew)
@@ -77,7 +96,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=2), Category="Data")
 	uint8 UintValue;
 
-
+public:
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection) override;
+	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection) override;
+	virtual uint32 MakeHash() const override;
 };
 
 UCLASS(Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNew)
@@ -89,5 +112,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=2), Category="Data")
 	FString StringValue;
 
-
+public:
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection) override;
+	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection) override;
+	virtual uint32 MakeHash() const override;
 };

@@ -6,11 +6,16 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "ConfigForgeSubsystem.generated.h"
 
+class UConfigPathProvider;
+class UConfigForgeFileRuntime;
 class UConfigValueObject;
 struct FConfigForgeFileData;
 class UConfigForgeFile;
 class UConfigForgeSetup;
 class UConfigForgeDeveloperSettings;
+
+
+DECLARE_DELEGATE_TwoParams(FLoadForgeFileDelegate, bool, UConfigForgeFileRuntime*);
 
 /**
  * @class UConfigForgeSubsystem
@@ -85,7 +90,15 @@ class CONFIGFORGE_API UConfigForgeSubsystem : public UGameInstanceSubsystem
 public:
 	UConfigForgeSubsystem();
 
+protected:
+	// Unique File id -> Runtime file object instance
+	TMap<FGuid, TObjectPtr<UConfigForgeFileRuntime>> RuntimeFiles;
+
+	// True if loading files right now (for async)
+	FThreadSafeBool bLoadingFiles;
+
 public:
+	#pragma region Get
 	/**
 	 * @brief Gets the developer settings for the ConfigForge system.
 	 * 
@@ -220,4 +233,18 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Get|Category")
 	void GetCategoryProperties(const FString& InFileName, const FName& InCategoryName, TArray<UConfigValueObject*>& OutProperties);
+
+	#pragma endregion
+
+protected:
+	bool LoadFileInternal(TSubclassOf<UConfigPathProvider> InPathProviderClass, const FGuid& InId, UConfigForgeFile* InTemplate, UConfigForgeFileRuntime*& OutFile);
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="I/O")
+	FORCEINLINE bool IsLoadingFiles() const { return bLoadingFiles; }
+
+	UFUNCTION(BlueprintCallable, Category="I/O")
+	bool LoadSingleFile(const FConfigForgeFileData& InFileData, UConfigForgeFileRuntime*& OutFile);
+
+	void LoadSingleFileAsync(const FConfigForgeFileData& InFileData, FLoadForgeFileDelegate Callback);
 };

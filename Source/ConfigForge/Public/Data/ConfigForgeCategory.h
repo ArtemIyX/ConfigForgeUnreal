@@ -23,4 +23,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, meta=(ShowOnlyInnerProperties), DisplayName="Category Properties", Category = "Category")
 	TArray<UConfigValueObject*> Fields;
+
+public:
+	
+	uint32 MakeHash() const;
 };
