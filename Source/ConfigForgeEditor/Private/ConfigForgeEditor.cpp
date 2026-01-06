@@ -5,7 +5,7 @@
 #include "Factories/AssetTypeActions_ConfigSetup.h"
 #include "Factories/AssetTypeActions_PathProvider.h"
 #include "Interfaces/IPluginManager.h"
-#include "K2/StringListPinFactory.h"
+
 #include "Styling/SlateStyleRegistry.h"
 
 TSharedPtr<FSlateStyleSet> FConfigForgeEditorModule::StyleSet;
@@ -48,7 +48,7 @@ void FConfigForgeEditorModule::StartupModule()
 		RegisterAssetActions<FAssetTypeActions_PathProvider>(assetTools);
 		RegisterAssetActions<FAssetTypeActions_ConfigSetup>(assetTools);
 		
-		RegisterPinFactory<FStringListPinFactory>();
+		//RegisterPinFactory<FStringListPinFactory>();
 	}
 }
 

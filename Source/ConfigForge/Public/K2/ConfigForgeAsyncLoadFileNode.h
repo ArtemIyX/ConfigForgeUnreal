@@ -9,7 +9,7 @@
 #include "Subsystems/ConfigForgeSubsystem.h"
 #include "ConfigForgeAsyncLoadFileNode.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnConfigForgeFileLoaded, bool, bSuccess, UConfigForgeFileRuntime*, LoadedFile);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnConfigForgeFileLoaded, UConfigForgeFileRuntime*, LoadedFile);
 
 /**
  * Async Blueprint node for loading ConfigForge files

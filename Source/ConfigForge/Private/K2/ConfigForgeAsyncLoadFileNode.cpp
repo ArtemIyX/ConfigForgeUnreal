@@ -16,7 +16,7 @@ void UConfigForgeAsyncLoadFileNode::Activate()
 {
 	if (!WorldContextObject.IsValid())
 	{
-		OnFailure.Broadcast(false, nullptr);
+		OnFailure.Broadcast(nullptr);
 		SetReadyToDestroy();
 		return;
 	}
@@ -25,7 +25,7 @@ void UConfigForgeAsyncLoadFileNode::Activate()
 	UGameInstance* gi = world->GetGameInstance();
 	if (!gi)
 	{
-		OnFailure.Broadcast(false, nullptr);
+		OnFailure.Broadcast(nullptr);
 		SetReadyToDestroy();
 		return;
 	}
@@ -33,7 +33,7 @@ void UConfigForgeAsyncLoadFileNode::Activate()
 	UConfigForgeSubsystem* configForgeSubsystem = gi->GetSubsystem<UConfigForgeSubsystem>();
 	if (!configForgeSubsystem)
 	{
-		OnFailure.Broadcast(false, nullptr);
+		OnFailure.Broadcast(nullptr);
 		SetReadyToDestroy();
 		return;
 	}
@@ -50,11 +50,11 @@ void UConfigForgeAsyncLoadFileNode::OnLoadComplete(bool bSuccess, UConfigForgeFi
 {
 	if (bSuccess && LoadedFile)
 	{
-		OnSuccess.Broadcast(true, LoadedFile);
+		OnSuccess.Broadcast(LoadedFile);
 	}
 	else
 	{
-		OnFailure.Broadcast(false, nullptr);
+		OnFailure.Broadcast(nullptr);
 	}
 
 	SetReadyToDestroy();
