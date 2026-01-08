@@ -8,6 +8,7 @@
 #include "UObject/Object.h"
 #include "ConfigValueObject.generated.h"
 
+class UConfigForgeMetaDataObject;
 /**
  *
  * 
@@ -18,7 +19,10 @@ class CONFIGFORGE_API UConfigValueObject : public UObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(DisplayPriority=1), Category="Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, meta=(DisplayPriority=1), Category="Data")
+	UConfigForgeMetaDataObject* MetaData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(DisplayPriority=2), Category="Data")
 	FString Key;
 
 public:

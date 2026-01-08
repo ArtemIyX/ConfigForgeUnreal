@@ -3,6 +3,7 @@
 #include "AssetToolsModule.h"
 #include "EdGraphUtilities.h"
 #include "Factories/AssetTypeActions_ConfigSetup.h"
+#include "Factories/AssetTypeActions_MetaObject.h"
 #include "Factories/AssetTypeActions_PathProvider.h"
 #include "Interfaces/IPluginManager.h"
 
@@ -47,7 +48,7 @@ void FConfigForgeEditorModule::StartupModule()
 		assetTools.RegisterAdvancedAssetCategory(FName(TEXT("Config")), FText::FromString(TEXT("Config Forge")));
 		RegisterAssetActions<FAssetTypeActions_PathProvider>(assetTools);
 		RegisterAssetActions<FAssetTypeActions_ConfigSetup>(assetTools);
-		
+		RegisterAssetActions<FAssetTypeActions_MetaObject>(assetTools);
 		//RegisterPinFactory<FStringListPinFactory>();
 	}
 }
@@ -158,6 +159,12 @@ TSharedRef<FSlateStyleSet> FConfigForgeEditorModule::Create() const
 
 	style->Set("ClassIcon.ConfigPathProvider",
 		new FSlateImageBrush(style->RootToContentDir(TEXT("ConfigPathProvider16.png")), icon16));
+
+	style->Set("ClassThumbnail.ConfigForgeMetaDataObject",
+		new FSlateImageBrush(style->RootToContentDir(TEXT("ConfigForgeMetaDataObject128.png")), icon128));
+
+	style->Set("ClassIcon.ConfigForgeMetaDataObject",
+		new FSlateImageBrush(style->RootToContentDir(TEXT("ConfigForgeMetaDataObject16.png")), icon16));
 
 	return style;
 }

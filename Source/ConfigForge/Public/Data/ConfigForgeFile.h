@@ -6,6 +6,7 @@
 #include "UObject/Object.h"
 #include "ConfigForgeFile.generated.h"
 
+class UConfigForgeMetaDataObject;
 class UConfigForgeCategory;
 
 /*UENUM(Blueprintable, BlueprintType)
@@ -30,8 +31,12 @@ public:
 	FString FileName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced)
+	UConfigForgeMetaDataObject* MetaData;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced)
 	TArray<TObjectPtr<UConfigForgeCategory>> Categories;
 
+	
 public:
 	UFUNCTION(BlueprintCallable, Category="File")
 	bool GetCategory(const FName& InCategoryName, UConfigForgeCategory*& OutCategory) const;

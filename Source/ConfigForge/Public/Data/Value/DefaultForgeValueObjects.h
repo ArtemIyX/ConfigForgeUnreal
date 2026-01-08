@@ -13,7 +13,7 @@ class CONFIGFORGE_API UBoolConfigObject : public UConfigValueObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=2), Category="Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=3), Category="Data")
 	bool bValue;
 
 public:
@@ -37,7 +37,7 @@ class CONFIGFORGE_API UFloatConfigObject : public UConfigValueObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=2), Category="Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=3), Category="Data")
 	float FloatValue;
 
 public:
@@ -60,7 +60,7 @@ class CONFIGFORGE_API UDoubleConfigObject : public UConfigValueObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=2), Category="Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=3), Category="Data")
 	double DoubleValue;
 
 public:
@@ -83,7 +83,7 @@ class CONFIGFORGE_API UIntConfigObject : public UConfigValueObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=2), Category="Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=3), Category="Data")
 	int32 IntValue;
 
 public:
@@ -105,7 +105,7 @@ class CONFIGFORGE_API UInt64ConfigObject : public UConfigValueObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=2), Category="Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=3), Category="Data")
 	int64 Int64Value;
 
 public:
@@ -127,7 +127,7 @@ class CONFIGFORGE_API UInt8ConfigObject : public UConfigValueObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=2), Category="Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=3), Category="Data")
 	uint8 UintValue;
 
 public:
@@ -149,7 +149,7 @@ class CONFIGFORGE_API UStringConfigObject : public UConfigValueObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=2), Category="Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Value", meta=(DisplayPriority=3), Category="Data")
 	FString StringValue;
 
 public:

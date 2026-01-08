@@ -7,6 +7,7 @@
 #include "ConfigForgeCategory.generated.h"
 
 
+class UConfigForgeMetaDataObject;
 class UConfigValueObject;
 
 UCLASS(Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNew)
@@ -20,6 +21,9 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName="Category Name", Category = "Category")
 	FName Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category="Category")
+	UConfigForgeMetaDataObject* MetaData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, meta=(ShowOnlyInnerProperties), DisplayName="Category Properties", Category = "Category")
 	TArray<UConfigValueObject*> Fields;
