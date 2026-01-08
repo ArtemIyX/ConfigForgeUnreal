@@ -688,6 +688,41 @@ void UConfigForgeSubsystem::LoadAllFilesAsync(FLoadAllForgeFileDelegate Callback
 	});
 }
 
+bool UConfigForgeSubsystem::LoadSelectedFiles(const TArray<FConfigForgeFileData>& InFiles, TArray<UConfigForgeFileRuntime*>& OutFiles)
+{
+	OutFiles.Empty();
+
+	if (bOperatingFiles)
+		return false;
+
+	bOperatingFiles = true;
+	const bool bSuccess = LoadAllFilesInternal(InFiles, OutFiles);
+	bOperatingFiles = false;
+
+	return bSuccess;
+}
+
+void UConfigForgeSubsystem::LoadSelectedFilesAsync(const TArray<FConfigForgeFileData>& InFiles, FLoadAllForgeFileDelegate Callback)
+{
+	if (bOperatingFiles)
+	{
+		Callback.ExecuteIfBound(false, {});
+		return;
+	}
+
+	TArray<FConfigForgeFileData> arr = InFiles;
+	bOperatingFiles = true;
+
+	Async(EAsyncExecution::TaskGraph, [this, arr, Callback]() {
+		TArray<UConfigForgeFileRuntime*> res;
+		const bool bSuccess = LoadAllFilesInternal(arr, res);
+		bOperatingFiles = false;
+		AsyncTask(ENamedThreads::GameThread, [this, res, bSuccess, Callback]() {
+			Callback.ExecuteIfBound(bSuccess, res);
+		});
+	});
+}
+
 bool UConfigForgeSubsystem::SaveAllFiles()
 {
 	if (bOperatingFiles)

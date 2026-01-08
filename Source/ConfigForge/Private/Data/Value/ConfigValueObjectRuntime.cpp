@@ -5,6 +5,11 @@
 
 #include "Data/Value/ConfigValueObject.h"
 
+void UConfigValueObjectRuntime::SetDynamicValue(const FDynamicValue& InValue)
+{
+	this->DynamicValue = InValue;
+}
+
 void UConfigValueObjectRuntime::SetToFile(const TSharedPtr<FConfigForgeIniFile>& InFilePtr, const FString& InSection)
 {
 	if (!Asset.IsValid())

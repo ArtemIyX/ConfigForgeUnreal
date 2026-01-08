@@ -38,6 +38,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="ConfigValue")
 	FORCEINLINE FDynamicValue GetDynamicValue() const { return DynamicValue; }
 
+	UFUNCTION(BlueprintCallable, Category="ConfigValue")
+	virtual void SetDynamicValue(const FDynamicValue& InValue);
+	
 public:
 	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InFilePtr, const FString& InSection);
 	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InFilePtr, const FString& InSection);

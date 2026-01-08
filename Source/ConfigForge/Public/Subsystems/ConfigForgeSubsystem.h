@@ -495,6 +495,11 @@ public:
 	 */
 	void LoadAllFilesAsync(FLoadAllForgeFileDelegate Callback);
 
+	UFUNCTION(BlueprintCallable, Category="I/O")
+	bool LoadSelectedFiles(const TArray<FConfigForgeFileData>& InFiles, TArray<UConfigForgeFileRuntime*>& OutFiles);
+	
+	void LoadSelectedFilesAsync(const TArray<FConfigForgeFileData>& InFiles, FLoadAllForgeFileDelegate Callback);
+	
 	/**
 	 * @brief Saves all currently loaded runtime configuration files synchronously.
 	 *
