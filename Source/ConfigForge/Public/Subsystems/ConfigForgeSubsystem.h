@@ -257,36 +257,111 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Runtime")
 	bool GetRuntimeFile(const FGuid& InUniqueFileId, UConfigForgeFileRuntime*& OutRuntimeFile) const;
 
+	/**
+	 * @brief Retrieves all runtime configuration files currently loaded in the subsystem.
+	 * @param OutRuntimeFiles [out] Array that will be populated with pointers to all runtime files.
+	 * @note The output array is cleared and repopulated with all valid runtime files.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Runtime")
 	void GetAllRuntimeFiles(TArray<UConfigForgeFileRuntime*>& OutRuntimeFiles) const;
 
+	/**
+	 * @brief Retrieves all categories from a specific runtime configuration file.
+	 * @param InConfigFile Pointer to the runtime configuration file to query.
+	 * @param OutCategories [out] Array that will be populated with pointers to all categories in the file.
+	 * @return True if categories were found, false if the file is invalid or contains no categories.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Runtime")
 	bool GetRuntimeCategories(const UConfigForgeFileRuntime* InConfigFile, TArray<UConfigForgeCategoryRuntime*>& OutCategories);
 
+	/**
+	 * @brief Retrieves all categories from a runtime configuration file identified by its GUID.
+	 * @param InFileId The unique identifier of the configuration file.
+	 * @param OutCategories [out] Array that will be populated with pointers to all categories in the file.
+	 * @return True if the file was found and categories were retrieved, false otherwise.
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime Categories (By File ID)", Category="Runtime")
 	bool GetRuntimeCategories_ID(const FGuid& InFileId, TArray<UConfigForgeCategoryRuntime*>& OutCategories);
 
+	/**
+	 * @brief Retrieves a specific category by name from a runtime configuration file.
+	 * @param InConfigFile Pointer to the runtime configuration file to query.
+	 * @param InCategoryName The name of the category to retrieve.
+	 * @param OutCategory [out] Pointer to the retrieved category if found.
+	 * @return True if the category was found, false if the file is invalid or the category doesn't exist.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Runtime")
 	bool GetRuntimeCategory(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory);
 
+	/**
+	 * @brief Retrieves a specific category by name from a runtime configuration file identified by its GUID.
+	 * @param InFileId The unique identifier of the configuration file.
+	 * @param InCategoryName The name of the category to retrieve.
+	 * @param OutCategory [out] Pointer to the retrieved category if found.
+	 * @return True if the file and category were found, false otherwise.
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime Category (By File ID)", Category="Runtime")
 	bool GetRuntimeCategory_ID(const FGuid& InFileId, const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory);
 
+	/**
+	 * @brief Retrieves a specific field by key from a runtime category.
+	 * @param InRuntimeCategory Pointer to the runtime category to query.
+	 * @param InKey The key identifier of the field to retrieve.
+	 * @param OutField [out] Pointer to the retrieved field value object if found.
+	 * @return True if the field was found, false if the category is invalid or the field doesn't exist.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Runtime")
 	bool GetRuntimeField(const UConfigForgeCategoryRuntime* InRuntimeCategory, const FString& InKey, UConfigValueObjectRuntime*& OutField);
 
+	/**
+	 * @brief Retrieves a specific field by key from a category within a runtime configuration file.
+	 * @param InConfigFile Pointer to the runtime configuration file to query.
+	 * @param InCategoryName The name of the category containing the field.
+	 * @param InKey The key identifier of the field to retrieve.
+	 * @param OutField [out] Pointer to the retrieved field value object if found.
+	 * @return True if the file, category, and field were found, false otherwise.
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime Field (From File Object)", Category="Runtime")
 	bool GetRuntimeField_File(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, const FString& InKey, UConfigValueObjectRuntime*& OutField);
 
+	/**
+	 * @brief Retrieves a specific field by key from a category within a runtime configuration file identified by its GUID.
+	 * @param InFileID The unique identifier of the configuration file.
+	 * @param InCategoryName The name of the category containing the field.
+	 * @param InKey The key identifier of the field to retrieve.
+	 * @param OutField [out] Pointer to the retrieved field value object if found.
+	 * @return True if the file, category, and field were found, false otherwise.
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime Field (By File ID)", Category="Runtime")
 	bool GetRuntimeField_ID(const FGuid& InFileID, const FName& InCategoryName, const FString& InKey, UConfigValueObjectRuntime*& OutField);
 
+	/**
+	 * @brief Retrieves all fields from a runtime category.
+	 * @param InRuntimeCategory Pointer to the runtime category to query.
+	 * @param OutFields [out] Array that will be populated with pointers to all field value objects in the category.
+	 * @return True if the category is valid, false if the category pointer is null.
+	 * @note Returns true even if the category contains no fields.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Runtime")
 	bool GetRuntimeFields(const UConfigForgeCategoryRuntime* InRuntimeCategory, TArray<UConfigValueObjectRuntime*>& OutFields);
 
+	/**
+	 * @brief Retrieves all fields from a category within a runtime configuration file.
+	 * @param InConfigFile Pointer to the runtime configuration file to query.
+	 * @param InCategoryName The name of the category containing the fields.
+	 * @param OutFields [out] Array that will be populated with pointers to all field value objects in the category.
+	 * @return True if the file and category were found, false otherwise.
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime All Fields (From File Object)", Category="Runtime")
 	bool GetRuntimeFields_File(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, TArray<UConfigValueObjectRuntime*>& OutFields);
 
+	/**
+	 * @brief Retrieves all fields from a category within a runtime configuration file identified by its GUID.
+	 * @param InFileID The unique identifier of the configuration file.
+	 * @param InCategoryName The name of the category containing the fields.
+	 * @param OutFields [out] Array that will be populated with pointers to all field value objects in the category.
+	 * @return True if the file and category were found, false otherwise.
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime All Fields (By File ID)", Category="Runtime")
 	bool GetRuntimeFields_ID(const FGuid& InFileID, const FName& InCategoryName, TArray<UConfigValueObjectRuntime*>& OutFields);
 	#pragma endregion

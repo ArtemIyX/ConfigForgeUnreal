@@ -345,7 +345,6 @@ bool UConfigForgeSubsystem::GetRuntimeFields_ID(const FGuid& InFileID, const FNa
 	return GetRuntimeFields(category, OutFields);
 }
 
-
 #pragma endregion
 
 #pragma region IO
