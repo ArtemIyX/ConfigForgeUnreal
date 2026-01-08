@@ -198,10 +198,27 @@ void UConfigForgeSubsystem::GetCategoryProperties(const FString& InFileName, con
 	}
 }
 
+bool UConfigForgeSubsystem::GetRuntimeFile(const FGuid& InUniqueFileId, UConfigForgeFileRuntime*& OutRuntimeFile) const
+{
+	const TObjectPtr<UConfigForgeFileRuntime>* itemPtr = RuntimeFiles.Find(InUniqueFileId);
+	if (itemPtr == nullptr)
+		return false;
+
+	const TObjectPtr<UConfigForgeFileRuntime> item = *itemPtr;
+	if (item == nullptr)
+		return false;
+
+	if (!item->IsValidData())
+		return false;
+
+	OutRuntimeFile = item;
+	return true;
+}
+
 #pragma endregion
 
 
-bool UConfigForgeSubsystem::LoadFileInternal(TSubclassOf<UConfigPathProvider> InPathProviderClass, const FGuid& InId, UConfigForgeFile* InTemplate, UConfigForgeFileRuntime*& OutFile)
+bool UConfigForgeSubsystem::ReadFileInternal(TSubclassOf<UConfigPathProvider> InPathProviderClass, const FGuid& InId, UConfigForgeFile* InTemplate, UConfigForgeFileRuntime*& OutFile)
 {
 	OutFile = nullptr;
 	if (!InTemplate)
@@ -217,7 +234,7 @@ bool UConfigForgeSubsystem::LoadFileInternal(TSubclassOf<UConfigPathProvider> In
 	const FString directoryPath = pathProvider->GetPath();
 	IPlatformFile& platformFile = FPlatformFileManager::Get().GetPlatformFile();
 
-	UE_LOG(LogConfigForge, Log, TEXT("%hs %s Loading file '%s'..."), __FUNCTION__,
+	UE_LOG(LogConfigForge, Log, TEXT("%hs %s Reading file '%s'..."), __FUNCTION__,
 		*GetNameSafe(pathProvider->GetClass()), *directoryPath);
 
 	if (!platformFile.DirectoryExists(*directoryPath))
@@ -300,36 +317,99 @@ bool UConfigForgeSubsystem::LoadFileInternal(TSubclassOf<UConfigPathProvider> In
 	return true;
 }
 
+bool UConfigForgeSubsystem::WriteFileInternal(UConfigForgeFileRuntime* InFile)
+{
+	if (!IsValid(InFile))
+		return false;
+
+	if (!InFile->IsValidData())
+		return false;
+
+	UConfigPathProvider* pathProvider = InFile->GetPathProvider();
+	if (!pathProvider)
+		return false;
+
+	const FString directoryPath = pathProvider->GetPath();
+	IPlatformFile& platformFile = FPlatformFileManager::Get().GetPlatformFile();
+
+	UE_LOG(LogConfigForge, Log, TEXT("%hs %s Reading file '%s'..."), __FUNCTION__,
+		*GetNameSafe(pathProvider->GetClass()), *directoryPath);
+
+	// Ensure directory exist
+	if (!platformFile.DirectoryExists(*directoryPath))
+	{
+		UE_LOG(LogConfigForge, Warning, TEXT("%hs Path provider '%s' directory '%s' doesnt exist, trying to create it..."), __FUNCTION__,
+			*GetNameSafe(pathProvider->GetClass()), *directoryPath);
+		const bool bCreated = platformFile.CreateDirectoryTree(*directoryPath);
+		if (!bCreated)
+		{
+			UE_LOG(LogConfigForge, Error, TEXT("%hs Path provider '%s' failed to create directory '%s'"), __FUNCTION__,
+				*GetNameSafe(pathProvider->GetClass()),
+				*directoryPath);
+			return false;
+		}
+	}
+
+	UConfigForgeFile* asset = InFile->GetFileAsset();
+	if (!asset)
+		return false;
+
+	const FString fileName = asset->FileName;
+	FString filePath = directoryPath / fileName;
+	if (FPaths::IsRelative(filePath))
+	{
+		filePath = FPaths::ConvertRelativePathToFull(filePath);
+	}
+
+	// Ensure file exists
+	if (!platformFile.FileExists(*filePath))
+	{
+		UE_LOG(LogConfigForge, Warning, TEXT("%hs Path provider '%s' file '%s' doesnt exist, trying to create it..."), __FUNCTION__,
+			*GetNameSafe(pathProvider->GetClass()), *filePath);
+
+		const bool bCreated = FFileHelper::SaveStringToFile(FString(TEXT("")), *filePath);
+		if (!bCreated)
+		{
+			UE_LOG(LogConfigForge, Error, TEXT("%hs Path provider '%s' failed to create file '%s'"), __FUNCTION__,
+				*GetNameSafe(pathProvider->GetClass()),
+				*filePath);
+			return false;
+		}
+	}
+
+	return InFile->ReadFrom(filePath);;
+}
+
 bool UConfigForgeSubsystem::LoadSingleFile(const FConfigForgeFileData& InFileData, UConfigForgeFileRuntime*& OutFile)
 {
 	OutFile = nullptr;
 
-	if (bLoadingFiles)
+	if (bOperatingFiles)
 		return false;
 
-	bLoadingFiles = true;
+	bOperatingFiles = true;
 
-	bool bLoaded = LoadFileInternal(InFileData.PathProvider, InFileData.ID(), InFileData.File.Get(), OutFile);
+	bool bLoaded = ReadFileInternal(InFileData.PathProvider, InFileData.ID(), InFileData.File.Get(), OutFile);
 
-	bLoadingFiles = false;
+	bOperatingFiles = false;
 
 	return bLoaded;
 }
 
 void UConfigForgeSubsystem::LoadSingleFileAsync(const FConfigForgeFileData& InFileData, FLoadForgeFileDelegate Callback)
 {
-	if (bLoadingFiles)
+	if (bOperatingFiles)
 	{
 		Callback.ExecuteIfBound(false, nullptr);
 		return;
 	}
 
-	bLoadingFiles = true;
+	bOperatingFiles = true;
 
 	Async(EAsyncExecution::TaskGraph, [this, InFileData, Callback]() {
 		UConfigForgeFileRuntime* runtimeFile;
-		const bool bLoaded = LoadFileInternal(InFileData.PathProvider, InFileData.ID(), InFileData.File.Get(), runtimeFile);
-		bLoadingFiles = false;
+		const bool bLoaded = ReadFileInternal(InFileData.PathProvider, InFileData.ID(), InFileData.File.Get(), runtimeFile);
+		bOperatingFiles = false;
 		if (bLoaded && runtimeFile != nullptr)
 		{
 			AsyncTask(ENamedThreads::GameThread, [this, runtimeFile, Callback]() {
@@ -342,5 +422,49 @@ void UConfigForgeSubsystem::LoadSingleFileAsync(const FConfigForgeFileData& InFi
 				Callback.ExecuteIfBound(false, nullptr);
 			});
 		}
+	});
+}
+
+bool UConfigForgeSubsystem::SaveSingleFile(const FGuid& InFileUniqueID)
+{
+	if (bOperatingFiles)
+		return false;
+
+	UConfigForgeFileRuntime* runtimeFile;
+	if (!GetRuntimeFile(InFileUniqueID, runtimeFile))
+		return false;
+
+	bOperatingFiles = true;
+
+	const bool bWrote = WriteFileInternal(runtimeFile);
+
+	bOperatingFiles = false;
+
+	return bWrote;
+}
+
+void UConfigForgeSubsystem::SaveSingleFileAsync(const FGuid& InFileUniqueID, FSaveForgeFileDelegate Callback)
+{
+	if (bOperatingFiles)
+	{
+		Callback.ExecuteIfBound(false);
+		return;
+	}
+
+	UConfigForgeFileRuntime* runtimeFile;
+	if (!GetRuntimeFile(InFileUniqueID, runtimeFile))
+	{
+		Callback.ExecuteIfBound(false);
+		return;
+	}
+
+	bOperatingFiles = true;
+
+	Async(EAsyncExecution::TaskGraph, [this, runtimeFile, Callback]() {
+		const bool bWrote = WriteFileInternal(runtimeFile);
+		bOperatingFiles = false;
+		AsyncTask(ENamedThreads::GameThread, [this, bWrote, Callback]() {
+			Callback.ExecuteIfBound(bWrote);
+		});
 	});
 }

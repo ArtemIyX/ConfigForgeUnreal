@@ -16,7 +16,7 @@ class UConfigForgeDeveloperSettings;
 
 
 DECLARE_DELEGATE_TwoParams(FLoadForgeFileDelegate, bool, UConfigForgeFileRuntime*);
-
+DECLARE_DELEGATE_OneParam(FSaveForgeFileDelegate, bool);
 /**
  * @class UConfigForgeSubsystem
  * @brief Game instance subsystem for managing configuration files and categories in the ConfigForge plugin.
@@ -94,8 +94,8 @@ protected:
 	// Unique File id -> Runtime file object instance
 	TMap<FGuid, TObjectPtr<UConfigForgeFileRuntime>> RuntimeFiles;
 
-	// True if loading files right now (for async)
-	FThreadSafeBool bLoadingFiles;
+	// True if reading/writing files right now (for async)
+	FThreadSafeBool bOperatingFiles;
 
 public:
 	#pragma region Get
@@ -236,18 +236,33 @@ public:
 
 	#pragma endregion
 
-protected:
-	bool LoadFileInternal(TSubclassOf<UConfigPathProvider> InPathProviderClass, const FGuid& InId, UConfigForgeFile* InTemplate, UConfigForgeFileRuntime*& OutFile);
+	#pragma region Runtime
+
+	UFUNCTION(BlueprintCallable, Category="Runtime")
+	bool GetRuntimeFile(const FGuid& InUniqueFileId, UConfigForgeFileRuntime*& OutRuntimeFile) const;
+
+	#pragma endregion
 
 public:
 	#pragma region IO
+
+protected:
+	bool ReadFileInternal(TSubclassOf<UConfigPathProvider> InPathProviderClass, const FGuid& InId, UConfigForgeFile* InTemplate, UConfigForgeFileRuntime*& OutFile);
+	bool WriteFileInternal(UConfigForgeFileRuntime* InFile);
+
+public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="I/O")
-	FORCEINLINE bool IsLoadingFiles() const { return bLoadingFiles; }
+	FORCEINLINE bool IsOperatingFiles() const { return bOperatingFiles; }
 
 	UFUNCTION(BlueprintCallable, Category="I/O")
 	bool LoadSingleFile(const FConfigForgeFileData& InFileData, UConfigForgeFileRuntime*& OutFile);
 
 	void LoadSingleFileAsync(const FConfigForgeFileData& InFileData, FLoadForgeFileDelegate Callback);
+
+	UFUNCTION(BlueprintCallable, Category="I/O")
+	bool SaveSingleFile(const FGuid& InFileUniqueID);
+	
+	void SaveSingleFileAsync(const FGuid& InFileUniqueID, FSaveForgeFileDelegate Callback);
 
 	#pragma endregion
 };

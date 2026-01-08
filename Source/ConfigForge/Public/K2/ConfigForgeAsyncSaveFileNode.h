@@ -1,21 +1,19 @@
 ﻿// © Artem Podorozhko. All Rights Reserved. This project, including all associated assets, code, and content, is the property of Artem Podorozhko. Unauthorized use, distribution, or modification is strictly prohibited.
 
-
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Data/ConfigForgeSetup.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
-#include "Subsystems/ConfigForgeSubsystem.h"
-#include "ConfigForgeAsyncLoadFileNode.generated.h"
+#include "UObject/Object.h"
+#include "ConfigForgeAsyncSaveFileNode.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnConfigForgeFileLoaded, UConfigForgeFileRuntime*, LoadedFile);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnConfigForgeFileSaved);
 
 /**
- * Async Blueprint node for loading ConfigForge files
+ * 
  */
 UCLASS()
-class CONFIGFORGE_API UConfigForgeAsyncLoadFileNode : public UBlueprintAsyncActionBase
+class CONFIGFORGE_API UConfigForgeAsyncSaveFileNode : public UBlueprintAsyncActionBase
 {
 	GENERATED_BODY()
 
@@ -23,30 +21,28 @@ public:
 	/**
 	 * Asynchronously loads a ConfigForge file
 	 * @param WorldContextObject - World context for getting the subsystem
-	 * @param FileData - The file data to load
+	 * @param InFileUniqueID - The file ID to pick file and save
 	 */
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"), Category = "ConfigForge|Async")
-	static UConfigForgeAsyncLoadFileNode* LoadConfigForgeFileAsync(UObject* WorldContextObject, const FConfigForgeFileData& FileData);
-
+	static UConfigForgeAsyncSaveFileNode* SaveConfigForgeFileAsync(UObject* WorldContextObject, const FGuid& InFileUniqueID);
 protected:
 	UPROPERTY()
 	TWeakObjectPtr<UObject> WorldContextObject;
 
 	UPROPERTY()
-	FConfigForgeFileData FileData;
+	FGuid FileID;
 
 public:
 	// UBlueprintAsyncActionBase interface
 	virtual void Activate() override;
 
 	UFUNCTION()
-	void OnLoadComplete(bool bSuccess, UConfigForgeFileRuntime* LoadedFile);
+	void OnSaveComplete(bool bSuccess);
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FOnConfigForgeFileLoaded OnSuccess;
+	FOnConfigForgeFileSaved OnSuccess;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnConfigForgeFileLoaded OnFailure;
-
+	FOnConfigForgeFileSaved OnFailure;
 };
