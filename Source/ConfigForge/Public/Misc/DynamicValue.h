@@ -14,6 +14,15 @@ private:
 	TSharedPtr<FValueHolderBase> Holder;
 
 public:
+
+	template <typename T>
+	static FDynamicValue Make(T&& InValue)
+	{
+		FDynamicValue result;
+		result.Set(Forward<T>(InValue));
+		return result;
+	}
+	
 	FDynamicValue() = default;
 
 	// Copy constructor
