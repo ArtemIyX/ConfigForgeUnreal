@@ -6,10 +6,10 @@
 
 UConfigForgeAsyncLoadFileNode* UConfigForgeAsyncLoadFileNode::LoadConfigForgeFileAsync(UObject* WorldContextObject, const FConfigForgeFileData& FileData)
 {
-	UConfigForgeAsyncLoadFileNode* Node = NewObject<UConfigForgeAsyncLoadFileNode>();
-	Node->WorldContextObject = WorldContextObject;
-	Node->FileData = FileData;
-	return Node;
+	UConfigForgeAsyncLoadFileNode* node = NewObject<UConfigForgeAsyncLoadFileNode>();
+	node->WorldContextObject = WorldContextObject;
+	node->FileData = FileData;
+	return node;
 }
 
 void UConfigForgeAsyncLoadFileNode::Activate()

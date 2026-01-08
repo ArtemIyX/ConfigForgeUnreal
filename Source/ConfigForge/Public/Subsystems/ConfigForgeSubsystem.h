@@ -17,6 +17,8 @@ class UConfigForgeDeveloperSettings;
 
 DECLARE_DELEGATE_TwoParams(FLoadForgeFileDelegate, bool, UConfigForgeFileRuntime*);
 DECLARE_DELEGATE_OneParam(FSaveForgeFileDelegate, bool);
+DECLARE_DELEGATE_TwoParams(FLoadAllForgeFileDelegate, bool, const TArray<UConfigForgeFileRuntime*>&);
+DECLARE_DELEGATE_OneParam(FSaveAllForgeFileDelegate, bool);
 /**
  * @class UConfigForgeSubsystem
  * @brief Game instance subsystem for managing configuration files and categories in the ConfigForge plugin.
@@ -252,6 +254,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Runtime")
 	bool GetRuntimeFile(const FGuid& InUniqueFileId, UConfigForgeFileRuntime*& OutRuntimeFile) const;
 
+	UFUNCTION(BlueprintCallable, Category="Runtime")
+	void GetAllRuntimeFiles(TArray<UConfigForgeFileRuntime*>& OutRuntimeFiles) const;
+
 	#pragma endregion
 
 public:
@@ -289,6 +294,9 @@ protected:
 	 */
 	bool WriteFileInternal(UConfigForgeFileRuntime* InFile);
 
+	bool LoadAllFilesInternal(const TArray<FConfigForgeFileData>& InDataArr, TArray<UConfigForgeFileRuntime*>& OutFiles);
+
+	bool WriteAllFilesInternal(const TArray<UConfigForgeFileRuntime*>& InFiles);
 public:
 	/**
 	 * @brief Checks whether a file load/save operation is currently in progress.
@@ -347,5 +355,14 @@ public:
 	 */
 	void SaveSingleFileAsync(const FGuid& InFileUniqueID, FSaveForgeFileDelegate Callback);
 
+	UFUNCTION(BlueprintCallable, Category="I/O")
+	bool LoadAllFiles(TArray<UConfigForgeFileRuntime*>& OutFiles);
+
+	void LoadAllFilesAsync(FLoadAllForgeFileDelegate Callback);
+
+	UFUNCTION(BlueprintCallable, Category="I/O")
+	bool SaveAllFiles();
+
+	void SaveAllFilesAsync(FSaveAllForgeFileDelegate Callback);
 	#pragma endregion
 };

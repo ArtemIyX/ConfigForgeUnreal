@@ -199,7 +199,6 @@ void UConfigForgeSubsystem::GetCategoryProperties(const FString& InFileName, con
 }
 
 
-
 #pragma endregion
 
 #pragma region Runtme
@@ -207,7 +206,7 @@ void UConfigForgeSubsystem::GetCategoryProperties(const FString& InFileName, con
 bool UConfigForgeSubsystem::GetRuntimeFile(const FGuid& InUniqueFileId, UConfigForgeFileRuntime*& OutRuntimeFile) const
 {
 	OutRuntimeFile = nullptr;
-	
+
 	const TObjectPtr<UConfigForgeFileRuntime>* itemPtr = RuntimeFiles.Find(InUniqueFileId);
 	if (itemPtr == nullptr)
 		return false;
@@ -224,7 +223,20 @@ bool UConfigForgeSubsystem::GetRuntimeFile(const FGuid& InUniqueFileId, UConfigF
 	return true;
 }
 
-#pragma endregion 
+void UConfigForgeSubsystem::GetAllRuntimeFiles(TArray<UConfigForgeFileRuntime*>& OutRuntimeFiles) const
+{
+	TArray<TObjectPtr<UConfigForgeFileRuntime>> values;
+	RuntimeFiles.GenerateValueArray(values);
+	const int32 n = values.Num();
+	OutRuntimeFiles.Empty();
+	OutRuntimeFiles.Reserve(n);
+	for (int32 i = 0; i < n; ++i)
+	{
+		OutRuntimeFiles.Add(values[i].Get());
+	}
+}
+
+#pragma endregion
 
 #pragma region IO
 
@@ -393,10 +405,43 @@ bool UConfigForgeSubsystem::WriteFileInternal(UConfigForgeFileRuntime* InFile)
 	return InFile->SaveTo(filePath);
 }
 
+bool UConfigForgeSubsystem::LoadAllFilesInternal(const TArray<FConfigForgeFileData>& InDataArr, TArray<UConfigForgeFileRuntime*>& OutFiles)
+{
+	OutFiles.Empty();
+	bool bSuccess = true;
+
+	OutFiles.Reserve(InDataArr.Num());
+	for (const FConfigForgeFileData& fd : InDataArr)
+	{
+		UConfigForgeFileRuntime* runtimeFile;
+		bSuccess &= ReadFileInternal(fd.PathProvider, fd.ID(), fd.File.Get(), runtimeFile);
+		if (runtimeFile)
+		{
+			OutFiles.Add(runtimeFile);
+		}
+	}
+
+	return bSuccess;
+}
+
+bool UConfigForgeSubsystem::WriteAllFilesInternal(const TArray<UConfigForgeFileRuntime*>& InFiles)
+{
+	bool bSuccess = true;
+
+	for (int32 i = 0; i < InFiles.Num(); ++i)
+	{
+		if (InFiles[i])
+		{
+			bSuccess &= WriteFileInternal(InFiles[i]);
+		}
+	}
+	return bSuccess;
+}
+
 bool UConfigForgeSubsystem::LoadSingleFile(const FConfigForgeFileData& InFileData, UConfigForgeFileRuntime*& OutFile)
 {
 	OutFile = nullptr;
-	
+
 	// Prevent reentrancy - only one file operation at a time
 	if (bOperatingFiles)
 		return false;
@@ -486,4 +531,99 @@ void UConfigForgeSubsystem::SaveSingleFileAsync(const FGuid& InFileUniqueID, FSa
 	});
 }
 
-#pragma endregion 
+bool UConfigForgeSubsystem::LoadAllFiles(TArray<UConfigForgeFileRuntime*>& OutFiles)
+{
+	OutFiles.Empty();
+
+	if (bOperatingFiles)
+		return false;
+
+	UConfigForgeSetup* setup = GetSettings()->ConfigSetup.LoadSynchronous();
+	if (!setup)
+		return false;
+
+	bOperatingFiles = true;
+
+	const bool bSuccess = LoadAllFilesInternal(setup->Files, OutFiles);
+
+	bOperatingFiles = false;
+
+	return bSuccess;
+}
+
+void UConfigForgeSubsystem::LoadAllFilesAsync(FLoadAllForgeFileDelegate Callback)
+{
+	if (bOperatingFiles)
+	{
+		Callback.ExecuteIfBound(false, {});
+		return;
+	}
+
+	UConfigForgeSetup* setup = GetSettings()->ConfigSetup.LoadSynchronous();
+	if (!setup)
+	{
+		Callback.ExecuteIfBound(false, {});
+		return;
+	}
+
+	TArray<FConfigForgeFileData> arr = setup->Files;
+
+	bOperatingFiles = true;
+	Async(EAsyncExecution::TaskGraph, [this, arr, Callback]() {
+		TArray<UConfigForgeFileRuntime*> res;
+		const bool bSuccess = LoadAllFilesInternal(arr, res);
+		bOperatingFiles = false;
+		AsyncTask(ENamedThreads::GameThread, [this, res, bSuccess, Callback]() {
+			Callback.ExecuteIfBound(bSuccess, res);
+		});
+	});
+}
+
+bool UConfigForgeSubsystem::SaveAllFiles()
+{
+	if (bOperatingFiles)
+		return false;
+
+	TArray<UConfigForgeFileRuntime*> arr;
+	GetAllRuntimeFiles(arr);
+
+	if (arr.Num() == 0)
+	{
+		return false;
+	}
+
+	bOperatingFiles = true;
+	bool bSuccess = WriteAllFilesInternal(arr);
+	bOperatingFiles = false;
+	return bSuccess;
+}
+
+void UConfigForgeSubsystem::SaveAllFilesAsync(FSaveAllForgeFileDelegate Callback)
+{
+	if (bOperatingFiles)
+	{
+		Callback.ExecuteIfBound(false);
+		return;
+	}
+
+	TArray<UConfigForgeFileRuntime*> arr;
+	GetAllRuntimeFiles(arr);
+
+	if (arr.Num() == 0)
+	{
+		Callback.ExecuteIfBound(false);
+		return;
+	}
+
+	bOperatingFiles = true;
+	Async(EAsyncExecution::TaskGraph, [this, arr, Callback]() {
+		bool bSuccess = WriteAllFilesInternal(arr);
+		bOperatingFiles = false;
+		AsyncTask(ENamedThreads::GameThread, [this, bSuccess, Callback]() {
+			Callback.ExecuteIfBound(bSuccess);
+		});
+	});
+
+}
+
+#pragma endregion

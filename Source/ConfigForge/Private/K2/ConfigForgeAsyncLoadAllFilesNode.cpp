@@ -1,23 +1,25 @@
 ﻿// © Artem Podorozhko. All Rights Reserved. This project, including all associated assets, code, and content, is the property of Artem Podorozhko. Unauthorized use, distribution, or modification is strictly prohibited.
 
 
-#include "K2/ConfigForgeAsyncSaveFileNode.h"
+#include "K2/ConfigForgeAsyncLoadAllFilesNode.h"
 
+#include "K2/ConfigForgeAsyncSaveFileNode.h"
 #include "Subsystems/ConfigForgeSubsystem.h"
 
-UConfigForgeAsyncSaveFileNode* UConfigForgeAsyncSaveFileNode::SaveConfigForgeFileAsync(UObject* WorldContextObject, const FGuid& InFileUniqueID)
+
+UConfigForgeAsyncLoadAllFilesNode* UConfigForgeAsyncLoadAllFilesNode::LoadConfigForgeFilesAsync(UObject* WorldContextObject)
 {
-	UConfigForgeAsyncSaveFileNode* node = NewObject<UConfigForgeAsyncSaveFileNode>();
+	UConfigForgeAsyncLoadAllFilesNode* node = NewObject<UConfigForgeAsyncLoadAllFilesNode>();
 	node->WorldContextObject = WorldContextObject;
-	node->FileID = InFileUniqueID;
+
 	return node;
 }
 
-void UConfigForgeAsyncSaveFileNode::Activate()
+void UConfigForgeAsyncLoadAllFilesNode::Activate()
 {
 	if (!WorldContextObject.IsValid())
 	{
-		OnFailure.Broadcast();
+		OnFinished.Broadcast({}, false);
 		SetReadyToDestroy();
 		return;
 	}
@@ -26,7 +28,7 @@ void UConfigForgeAsyncSaveFileNode::Activate()
 	UGameInstance* gi = world->GetGameInstance();
 	if (!gi)
 	{
-		OnFailure.Broadcast();
+		OnFinished.Broadcast({}, false);
 		SetReadyToDestroy();
 		return;
 	}
@@ -34,28 +36,21 @@ void UConfigForgeAsyncSaveFileNode::Activate()
 	UConfigForgeSubsystem* configForgeSubsystem = gi->GetSubsystem<UConfigForgeSubsystem>();
 	if (!configForgeSubsystem)
 	{
-		OnFailure.Broadcast();
+		OnFinished.Broadcast({}, false);
 		SetReadyToDestroy();
 		return;
 	}
 
 	// Create delegate for callback
-	FSaveForgeFileDelegate callback;
-	callback.BindUObject(this, &UConfigForgeAsyncSaveFileNode::OnSaveComplete);
+	FLoadAllForgeFileDelegate callback;
+	callback.BindUObject(this, &UConfigForgeAsyncLoadAllFilesNode::OnLoadComplete);
 
 	// Start async load
-	configForgeSubsystem->SaveSingleFileAsync(FileID, callback);
+	configForgeSubsystem->LoadAllFilesAsync(callback);
 }
 
-void UConfigForgeAsyncSaveFileNode::OnSaveComplete(bool bSuccess)
+void UConfigForgeAsyncLoadAllFilesNode::OnLoadComplete(bool bSuccess, const TArray<UConfigForgeFileRuntime*>& InFiles)
 {
-	if (bSuccess)
-	{
-		OnSuccess.Broadcast();
-	}
-	else
-	{
-		OnFailure.Broadcast();
-	}
+	OnFinished.Broadcast(InFiles, bSuccess);
 	SetReadyToDestroy();
 }
