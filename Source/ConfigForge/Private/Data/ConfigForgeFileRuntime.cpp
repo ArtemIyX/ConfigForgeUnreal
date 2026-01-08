@@ -35,8 +35,27 @@ void UConfigForgeFileRuntime::InitDefaultData()
 		{
 			UConfigForgeCategoryRuntime* runtimeCategory = NewObject<UConfigForgeCategoryRuntime>(this);
 			runtimeCategory->InitData(FileAsset->Categories[i]);
-			CategoriesRuntime.Add(runtimeCategory);
+			CategoriesRuntime.Add(runtimeCategory->GetCategoryName(), runtimeCategory);
 		}
+	}
+}
+
+bool UConfigForgeFileRuntime::GetCategory(const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory) const
+{
+	if (!CategoriesRuntime.Contains(InCategoryName))
+		return false;
+
+	OutCategory = CategoriesRuntime[InCategoryName];
+	return IsValid(OutCategory);
+}
+
+void UConfigForgeFileRuntime::GetCategories(TArray<UConfigForgeCategoryRuntime*>& OutCategories) const
+{
+	OutCategories.Empty();
+	OutCategories.Reserve(CategoriesRuntime.Num());
+	for (const TPair<FName, TObjectPtr<UConfigForgeCategoryRuntime>>& pair : CategoriesRuntime)
+	{
+		OutCategories.Add(pair.Value.Get());
 	}
 }
 
@@ -48,15 +67,23 @@ void UConfigForgeFileRuntime::BeginDestroy()
 		PathProvider->ConditionalBeginDestroy();
 		PathProvider = nullptr;
 	}
-	const int32 n = CategoriesRuntime.Num();
-	for (int32 i = 0; i < n; i++)
+
+	TArray<FName> keys;
+	const int32 n = keys.Num();
+	CategoriesRuntime.GetKeys(keys);
+	for (int32 i = 0; i < n; ++i)
 	{
-		if (CategoriesRuntime[i])
+		TObjectPtr<UConfigForgeCategoryRuntime>* itemPtr = CategoriesRuntime.Find(keys[i]);
+		if (itemPtr)
 		{
-			CategoriesRuntime[i]->ConditionalBeginDestroy();
+			TObjectPtr<UConfigForgeCategoryRuntime> item = *itemPtr;
+			if (item)
+			{
+				item->ConditionalBeginDestroy();
+			}
 		}
-		CategoriesRuntime[i] = nullptr;
 	}
+
 	CategoriesRuntime.Empty();
 	UObject::BeginDestroy();
 }
@@ -72,15 +99,14 @@ bool UConfigForgeFileRuntime::SaveTo(const FString& InPath)
 	// Just create FConfigObject instance, even if file exists
 	file->Load();
 
-	const int32 categoryNum = CategoriesRuntime.Num();
-	for (int32 i = 0; i < categoryNum; ++i)
+	for (const TPair<FName, TObjectPtr<UConfigForgeCategoryRuntime>>& pair : CategoriesRuntime)
 	{
-		if (CategoriesRuntime[i])
+		if (TObjectPtr<UConfigForgeCategoryRuntime> ptr = pair.Value)
 		{
-			const FName categoryName = CategoriesRuntime[i]->GetCategoryName();
+			const FName categoryName = ptr->GetCategoryName();
 
 			TArray<TWeakObjectPtr<UConfigValueObjectRuntime>> fieldRuntime;
-			CategoriesRuntime[i]->GetFields(fieldRuntime);
+			ptr->GetFields(fieldRuntime);
 			for (int32 j = 0; j < fieldRuntime.Num(); ++j)
 			{
 				if (fieldRuntime[j].IsValid())
@@ -108,21 +134,21 @@ bool UConfigForgeFileRuntime::ReadFrom(const FString& InPath)
 
 	if (!file)
 		return false;
-	
+
 	// Just create FConfigObject instance, even if file exists
 	file->Load();
 
 	const int32 categoryNum = CategoriesRuntime.Num();
 
 	bool bSuccess = true;
-	for (int32 i = 0; i < categoryNum; ++i)
+	for (const TPair<FName, TObjectPtr<UConfigForgeCategoryRuntime>>& pair : CategoriesRuntime)
 	{
-		if (CategoriesRuntime[i])
+		if (TObjectPtr<UConfigForgeCategoryRuntime> ptr = pair.Value)
 		{
-			const FName categoryName = CategoriesRuntime[i]->GetCategoryName();
+			const FName categoryName = ptr->GetCategoryName();
 
 			TArray<TWeakObjectPtr<UConfigValueObjectRuntime>> fieldRuntime;
-			CategoriesRuntime[i]->GetFields(fieldRuntime);
+			ptr->GetFields(fieldRuntime);
 			for (int32 j = 0; j < fieldRuntime.Num(); ++j)
 			{
 				if (fieldRuntime[j].IsValid())
@@ -137,7 +163,6 @@ bool UConfigForgeFileRuntime::ReadFrom(const FString& InPath)
 			}
 		}
 	}
-	
 
 	file.Reset();
 	return bSuccess;

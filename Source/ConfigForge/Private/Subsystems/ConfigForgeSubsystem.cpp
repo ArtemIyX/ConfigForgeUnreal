@@ -236,6 +236,49 @@ void UConfigForgeSubsystem::GetAllRuntimeFiles(TArray<UConfigForgeFileRuntime*>&
 	}
 }
 
+bool UConfigForgeSubsystem::GetRuntimeCategories(const UConfigForgeFileRuntime* InConfigFile, TArray<UConfigForgeCategoryRuntime*>& OutCategories)
+{
+	if (!InConfigFile)
+		return false;
+
+	OutCategories.Empty();
+	InConfigFile->GetCategories(OutCategories);
+
+	return OutCategories.Num() > 0;
+}
+
+bool UConfigForgeSubsystem::GetRuntimeCategories_ID(const FGuid& InFileId, TArray<UConfigForgeCategoryRuntime*>& OutCategories)
+{
+	UConfigForgeFileRuntime* runtimeFile;
+	if (!GetRuntimeFile(InFileId, runtimeFile))
+		return false;
+
+	if (runtimeFile == nullptr)
+		return false;
+
+	return GetRuntimeCategories(runtimeFile, OutCategories);
+}
+
+bool UConfigForgeSubsystem::GetRuntimeCategory(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory)
+{
+	if (!InConfigFile)
+		return false;
+	return InConfigFile->GetCategory(InCategoryName, OutCategory);
+}
+
+bool UConfigForgeSubsystem::GetRuntimeCategory_ID(const FGuid& InFileId, const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory)
+{
+	UConfigForgeFileRuntime* runtimeFile;
+	if (!GetRuntimeFile(InFileId, runtimeFile))
+		return false;
+
+	if (runtimeFile == nullptr)
+		return false;
+
+	return GetRuntimeCategory(runtimeFile, InCategoryName, OutCategory);
+}
+
+
 #pragma endregion
 
 #pragma region IO

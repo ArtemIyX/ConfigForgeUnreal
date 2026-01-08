@@ -20,6 +20,20 @@ void UConfigForgeCategoryRuntime::GetFields(TArray<TWeakObjectPtr<UConfigValueOb
 	}
 }
 
+void UConfigForgeCategoryRuntime::BP_GetFields(TArray<UConfigValueObjectRuntime*>& OutResult) const
+{
+	OutResult.Empty();
+	const int32 n = FieldsRuntime.Num();
+	OutResult.Reserve(n);
+	for (int32 i = 0; i < n; ++i)
+	{
+		if (FieldsRuntime[i])
+		{
+			OutResult.Add(FieldsRuntime[i].Get());
+		}
+	}
+}
+
 void UConfigForgeCategoryRuntime::InitData(UConfigForgeCategory* InCategoryAsset)
 {
 	FieldsRuntime.Empty();

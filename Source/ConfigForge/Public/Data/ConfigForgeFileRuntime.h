@@ -35,7 +35,7 @@ protected:
 	FString FileName;
 
 	UPROPERTY()
-	TArray<TObjectPtr<UConfigForgeCategoryRuntime>> CategoriesRuntime;
+	TMap<FName, TObjectPtr<UConfigForgeCategoryRuntime>> CategoriesRuntime;
 
 	UPROPERTY()
 	FGuid UniqueFileID;
@@ -63,6 +63,9 @@ public:
 	#pragma endregion
 
 	#pragma region Get
+	
+	bool GetCategory(const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory) const;
+	void GetCategories(TArray<UConfigForgeCategoryRuntime*>& OutCategories) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Get")
 	FORCEINLINE FString GetFileName() const { return FileName; }

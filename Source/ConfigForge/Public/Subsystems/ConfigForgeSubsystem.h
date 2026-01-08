@@ -6,6 +6,8 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "ConfigForgeSubsystem.generated.h"
 
+class UConfigForgeCategory;
+class UConfigForgeCategoryRuntime;
 class UConfigPathProvider;
 class UConfigForgeFileRuntime;
 class UConfigValueObject;
@@ -257,6 +259,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Runtime")
 	void GetAllRuntimeFiles(TArray<UConfigForgeFileRuntime*>& OutRuntimeFiles) const;
 
+	UFUNCTION(BlueprintCallable, Category="Runtime")
+	bool GetRuntimeCategories(const UConfigForgeFileRuntime* InConfigFile, TArray<UConfigForgeCategoryRuntime*>& OutCategories);
+
+	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime Categories (By File ID)", Category="Runtime")
+	bool GetRuntimeCategories_ID(const FGuid& InFileId, TArray<UConfigForgeCategoryRuntime*>& OutCategories);
+
+	UFUNCTION(BlueprintCallable, Category="Runtime")
+	bool GetRuntimeCategory(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory);
+
+	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime Category (By File ID)", Category="Runtime")
+	bool GetRuntimeCategory_ID(const FGuid& InFileId, const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory);
+
 	#pragma endregion
 
 public:
@@ -297,6 +311,7 @@ protected:
 	bool LoadAllFilesInternal(const TArray<FConfigForgeFileData>& InDataArr, TArray<UConfigForgeFileRuntime*>& OutFiles);
 
 	bool WriteAllFilesInternal(const TArray<UConfigForgeFileRuntime*>& InFiles);
+
 public:
 	/**
 	 * @brief Checks whether a file load/save operation is currently in progress.
@@ -355,14 +370,64 @@ public:
 	 */
 	void SaveSingleFileAsync(const FGuid& InFileUniqueID, FSaveForgeFileDelegate Callback);
 
+	/**
+	 * @brief Loads all configuration files synchronously.
+	 *
+	 * Clears the output array and attempts to load every file defined in the ConfigForge setup asset.
+	 * The files are loaded into runtime objects (UConfigForgeFileRuntime*) that hold the parsed data.
+	 *
+	 * @param OutFiles [out] Array that will be populated with pointers to the loaded runtime file objects.
+	 *                 The caller is responsible for managing the lifetime of these objects (they are owned by the subsystem).
+	 * @return true if all files were successfully loaded, false otherwise (e.g., setup missing or already operating).
+	 *
+	 * @note This is a BlueprintCallable function.
+	 * @note This function blocks the calling thread until completion.
+	 * @note If another load/save operation is already in progress (bOperatingFiles == true), the function returns false immediately.
+	 */
 	UFUNCTION(BlueprintCallable, Category="I/O")
 	bool LoadAllFiles(TArray<UConfigForgeFileRuntime*>& OutFiles);
 
+	/**
+	 * @brief Loads all configuration files asynchronously.
+	 *
+	 * Starts an asynchronous task on the task graph to load all files. When complete, the provided delegate
+	 * is executed on the game thread with the results.
+	 *
+	 * @param Callback Delegate called when the operation finishes.
+	 *                 Signature: void(bool bSuccess, const TArray<UConfigForgeFileRuntime*>& LoadedFiles)
+	 *
+	 * @note If another load/save operation is already in progress or the setup is invalid, the callback
+	 *       is invoked immediately with failure.
+	 * @note The runtime file objects in the result array are owned by the subsystem.
+	 */
 	void LoadAllFilesAsync(FLoadAllForgeFileDelegate Callback);
 
+	/**
+	 * @brief Saves all currently loaded runtime configuration files synchronously.
+	 *
+	 * Retrieves all runtime file objects currently managed by the subsystem and writes them to disk.
+	 *
+	 * @return true if all files were successfully saved, false otherwise
+	 *         (e.g., no files loaded, or another operation already in progress).
+	 *
+	 * @note This is a BlueprintCallable function.
+	 * @note This function blocks the calling thread until completion.
+	 */
 	UFUNCTION(BlueprintCallable, Category="I/O")
 	bool SaveAllFiles();
 
+	/**
+	 * @brief Saves all currently loaded runtime configuration files asynchronously.
+	 *
+	 * Starts an asynchronous task on the task graph to save all managed runtime files.
+	 * When complete, the provided delegate is executed on the game thread.
+	 *
+	 * @param Callback Delegate called when the operation finishes.
+	 *                 Signature: void(bool bSuccess)
+	 *
+	 * @note If no files are loaded or another operation is already in progress, the callback
+	 *       is invoked immediately with failure.
+	 */
 	void SaveAllFilesAsync(FSaveAllForgeFileDelegate Callback);
 	#pragma endregion
 };

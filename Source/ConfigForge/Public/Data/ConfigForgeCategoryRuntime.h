@@ -10,7 +10,7 @@ class UConfigValueObjectRuntime;
 /**
  * 
  */
-UCLASS(NotBlueprintable, NotBlueprintType)
+UCLASS(Blueprintable, BlueprintType)
 class CONFIGFORGE_API UConfigForgeCategoryRuntime : public UObject
 {
 	GENERATED_BODY()
@@ -26,10 +26,16 @@ protected:
 	TArray<TObjectPtr<UConfigValueObjectRuntime>> FieldsRuntime;
 
 public:
-	FName GetCategoryName() const { return CategoryName; }
-	TWeakObjectPtr<UConfigForgeCategory> GetCategoryAsset() const { return CategoryAsset; }
+	UFUNCTION(BlueprintCallable, Category="Category")
+	FORCEINLINE FName GetCategoryName() const { return CategoryName; }
+
+	UFUNCTION(BlueprintCallable, Category="Category")
+	FORCEINLINE UConfigForgeCategory* GetCategoryAsset() const { return CategoryAsset.Get(); }
+
 	void GetFields(TArray<TWeakObjectPtr<UConfigValueObjectRuntime>>& OutResult) const;
 
+	UFUNCTION(BlueprintCallable, Category="Category")
+	void BP_GetFields(TArray<UConfigValueObjectRuntime*>& OutResult) const;
 public:
 	void InitData(UConfigForgeCategory* InCategoryAsset);
 
