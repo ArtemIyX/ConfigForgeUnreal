@@ -238,6 +238,17 @@ public:
 
 	#pragma region Runtime
 
+	/**
+	 * @brief Retrieves a loaded runtime file instance by its unique ID.
+	 *
+	 * Searches the internal RuntimeFiles map for a valid UConfigForgeFileRuntime object
+	 * associated with the given InUniqueFileId.
+	 *
+	 * @param InUniqueFileId The unique GUID of the file to retrieve.
+	 * @param OutRuntimeFile [out] Pointer to the runtime file object if found and valid.
+	 * @return true if a valid runtime file was found and returned; false otherwise
+	 *         (file not loaded, invalid pointer, or data not valid via IsValidData()).
+	 */
 	UFUNCTION(BlueprintCallable, Category="Runtime")
 	bool GetRuntimeFile(const FGuid& InUniqueFileId, UConfigForgeFileRuntime*& OutRuntimeFile) const;
 
@@ -247,21 +258,93 @@ public:
 	#pragma region IO
 
 protected:
+	/**
+	 * @brief Internal function that loads (and creates) a config file from disk.
+	 *
+	 * This is the core implementation used by both synchronous and asynchronous load functions.
+	 * It:
+	 * - Creates the directory tree if it doesn't exist
+	 * - Creates a new UConfigForgeFileRuntime instance
+	 * - Initializes it with default values from the template asset
+	 * - Replaces any previously loaded file with the same ID
+	 * - Attempts to read data from disk; if that fails or file doesn't exist, saves defaults
+	 *
+	 * @param InPathProviderClass Class of the path provider determining where to read/write.
+	 * @param InId Unique ID of the file to assign map key.
+	 * @param InTemplate Template asset containing metadata (e.g., FileName) and default values.
+	 * @param OutFile [out] The created/loaded runtime file object on success.
+	 * @return true if the file was successfully set up and OutFile is valid.
+	 */
 	bool ReadFileInternal(TSubclassOf<UConfigPathProvider> InPathProviderClass, const FGuid& InId, UConfigForgeFile* InTemplate, UConfigForgeFileRuntime*& OutFile);
+
+	/**
+	 * @brief Internal function that writes a runtime file to disk.
+	 *
+	 * Ensures the directory and file exist, then calls SaveTo() on the runtime file.
+	 * Note: The current implementation has a bug — it calls ReadFrom() instead of SaveTo().
+	 * This function is intended to save the in-memory data to disk.
+	 *
+	 * @param InFile The runtime file to write.
+	 * @return true if all preconditions passed and the save operation succeeded.
+	 */
 	bool WriteFileInternal(UConfigForgeFileRuntime* InFile);
 
 public:
+	/**
+	 * @brief Checks whether a file load/save operation is currently in progress.
+	 *
+	 * Used to prevent concurrent operations on the subsystem (reentrancy protection).
+	 *
+	 * @return true if a file operation is active.
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="I/O")
 	FORCEINLINE bool IsOperatingFiles() const { return bOperatingFiles; }
 
+	/**
+	 * @brief Synchronously loads a single config file from disk.
+	 *
+	 * Blocks the calling thread and uses ReadFileInternal().
+	 * Fails immediately if another operation is already in progress (bOperatingFiles == true).
+	 *
+	 * @param InFileData Structure containing the path provider class, file ID, and template asset.
+	 * @param OutFile [out] The loaded runtime file object on success.
+	 * @return true if the file was successfully loaded/created.
+	 */
 	UFUNCTION(BlueprintCallable, Category="I/O")
 	bool LoadSingleFile(const FConfigForgeFileData& InFileData, UConfigForgeFileRuntime*& OutFile);
 
+	/**
+	 * @brief Asynchronously loads a single config file from disk.
+	 *
+	 * Runs the heavy I/O on the task graph thread and delivers the result back on the game thread.
+	 * If another operation is in progress, the callback is called immediately with failure.
+	 *
+	 * @param InFileData Structure containing the path provider class, file ID, and template asset.
+	 * @param Callback Delegate called on the game thread with success flag and runtime file (or nullptr).
+	 */
 	void LoadSingleFileAsync(const FConfigForgeFileData& InFileData, FLoadForgeFileDelegate Callback);
 
+	/**
+	 * @brief Synchronously saves a single loaded config file to disk.
+	 *
+	 * Looks up the runtime file by ID, then calls WriteFileInternal().
+	 * Fails immediately if another operation is in progress or the file is not loaded.
+	 *
+	 * @param InFileUniqueID The unique ID of the file to save.
+	 * @return true if the file was successfully written to disk.
+	 */
 	UFUNCTION(BlueprintCallable, Category="I/O")
 	bool SaveSingleFile(const FGuid& InFileUniqueID);
-	
+
+	/**
+	 * @brief Asynchronously saves a single loaded config file to disk.
+	 *
+	 * Runs the save operation on the task graph thread and reports back on the game thread.
+	 * If another operation is in progress or the file is not loaded, the callback is called immediately with failure.
+	 *
+	 * @param InFileUniqueID The unique ID of the file to save.
+	 * @param Callback Delegate called on the game thread with success flag.
+	 */
 	void SaveSingleFileAsync(const FGuid& InFileUniqueID, FSaveForgeFileDelegate Callback);
 
 	#pragma endregion

@@ -19,7 +19,7 @@ class CONFIGFORGE_API UConfigForgeAsyncSaveFileNode : public UBlueprintAsyncActi
 
 public:
 	/**
-	 * Asynchronously loads a ConfigForge file
+	 * Asynchronously saves a ConfigForge file
 	 * @param WorldContextObject - World context for getting the subsystem
 	 * @param InFileUniqueID - The file ID to pick file and save
 	 */

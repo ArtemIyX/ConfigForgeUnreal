@@ -198,8 +198,16 @@ void UConfigForgeSubsystem::GetCategoryProperties(const FString& InFileName, con
 	}
 }
 
+
+
+#pragma endregion
+
+#pragma region Runtme
+
 bool UConfigForgeSubsystem::GetRuntimeFile(const FGuid& InUniqueFileId, UConfigForgeFileRuntime*& OutRuntimeFile) const
 {
+	OutRuntimeFile = nullptr;
+	
 	const TObjectPtr<UConfigForgeFileRuntime>* itemPtr = RuntimeFiles.Find(InUniqueFileId);
 	if (itemPtr == nullptr)
 		return false;
@@ -208,15 +216,17 @@ bool UConfigForgeSubsystem::GetRuntimeFile(const FGuid& InUniqueFileId, UConfigF
 	if (item == nullptr)
 		return false;
 
+	// Additional validity check - ensures data was properly initialized/read
 	if (!item->IsValidData())
 		return false;
 
-	OutRuntimeFile = item;
+	OutRuntimeFile = item.Get();
 	return true;
 }
 
-#pragma endregion
+#pragma endregion 
 
+#pragma region IO
 
 bool UConfigForgeSubsystem::ReadFileInternal(TSubclassOf<UConfigPathProvider> InPathProviderClass, const FGuid& InId, UConfigForgeFile* InTemplate, UConfigForgeFileRuntime*& OutFile)
 {
@@ -271,10 +281,12 @@ bool UConfigForgeSubsystem::ReadFileInternal(TSubclassOf<UConfigPathProvider> In
 	// Put default values
 	runtimeFile->InitDefaultData();
 
-	// Remove previous object if necessary
+	// Replace any previously loaded version of the same file
 	if (RuntimeFiles.Contains(InId))
 	{
 		TObjectPtr<UConfigForgeFileRuntime>& filePtr = RuntimeFiles[InId];
+
+		// Properly clean up old instance
 		if (filePtr != nullptr)
 		{
 			filePtr->ConditionalBeginDestroy();
@@ -283,7 +295,8 @@ bool UConfigForgeSubsystem::ReadFileInternal(TSubclassOf<UConfigPathProvider> In
 		RuntimeFiles.Remove(InId);
 	}
 
-	if (!platformFile.FileExists(*directoryPath))
+	// If file doesn't exist on disk, create it with defaults
+	if (!platformFile.FileExists(*filePath))
 	{
 		UE_LOG(LogConfigForge, Warning, TEXT("%hs Path provider '%s', file '%s' doesnt exist, trying to create default file"), __FUNCTION__,
 			*GetNameSafe(pathProvider->GetClass()), *filePath);
@@ -295,7 +308,7 @@ bool UConfigForgeSubsystem::ReadFileInternal(TSubclassOf<UConfigPathProvider> In
 	UE_LOG(LogConfigForge, Log, TEXT("%hs %s Reading file '%s'..."), __FUNCTION__,
 		*GetNameSafe(pathProvider->GetClass()), *filePath);
 
-	// Read all possible data from file
+	// Attempt to read; on failure, overwrite with current (default) data
 	if (runtimeFile->ReadFrom(filePath))
 	{
 		UE_LOG(LogConfigForge, Log, TEXT("%hs %s File '%s has been reed successfully!"), __FUNCTION__,
@@ -309,7 +322,7 @@ bool UConfigForgeSubsystem::ReadFileInternal(TSubclassOf<UConfigPathProvider> In
 		runtimeFile->SaveTo(filePath);
 	}
 
-	// Store file object in map
+	// Store for later retrieval
 	RuntimeFiles.Add(InId, runtimeFile);
 
 	OutFile = runtimeFile;
@@ -377,13 +390,14 @@ bool UConfigForgeSubsystem::WriteFileInternal(UConfigForgeFileRuntime* InFile)
 		}
 	}
 
-	return InFile->ReadFrom(filePath);;
+	return InFile->SaveTo(filePath);
 }
 
 bool UConfigForgeSubsystem::LoadSingleFile(const FConfigForgeFileData& InFileData, UConfigForgeFileRuntime*& OutFile)
 {
 	OutFile = nullptr;
-
+	
+	// Prevent reentrancy - only one file operation at a time
 	if (bOperatingFiles)
 		return false;
 
@@ -398,6 +412,7 @@ bool UConfigForgeSubsystem::LoadSingleFile(const FConfigForgeFileData& InFileDat
 
 void UConfigForgeSubsystem::LoadSingleFileAsync(const FConfigForgeFileData& InFileData, FLoadForgeFileDelegate Callback)
 {
+	// Prevent reentrancy - only one file operation at a time
 	if (bOperatingFiles)
 	{
 		Callback.ExecuteIfBound(false, nullptr);
@@ -427,6 +442,7 @@ void UConfigForgeSubsystem::LoadSingleFileAsync(const FConfigForgeFileData& InFi
 
 bool UConfigForgeSubsystem::SaveSingleFile(const FGuid& InFileUniqueID)
 {
+	// Prevent reentrancy - only one file operation at a time
 	if (bOperatingFiles)
 		return false;
 
@@ -445,6 +461,7 @@ bool UConfigForgeSubsystem::SaveSingleFile(const FGuid& InFileUniqueID)
 
 void UConfigForgeSubsystem::SaveSingleFileAsync(const FGuid& InFileUniqueID, FSaveForgeFileDelegate Callback)
 {
+	// Prevent reentrancy - only one file operation at a time
 	if (bOperatingFiles)
 	{
 		Callback.ExecuteIfBound(false);
@@ -468,3 +485,5 @@ void UConfigForgeSubsystem::SaveSingleFileAsync(const FGuid& InFileUniqueID, FSa
 		});
 	});
 }
+
+#pragma endregion 
