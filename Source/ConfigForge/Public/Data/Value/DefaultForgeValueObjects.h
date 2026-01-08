@@ -17,9 +17,17 @@ public:
 	bool bValue;
 
 public:
-	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection) override;
+
+	virtual void SetDefaultValue(FDynamicValue& InDynamicValue) override;
+	
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection,
+		const FDynamicValue& InDynamicValue) override;
+
 	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
-		const FString& InSection) override;
+		const FString& InSection,
+		FDynamicValue& InDynamicValue) override;
+
 	virtual uint32 MakeHash() const override;
 };
 
@@ -33,9 +41,16 @@ public:
 	float FloatValue;
 
 public:
-	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection) override;
+	virtual void SetDefaultValue(FDynamicValue& InDynamicValue) override;
+	
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection,
+		const FDynamicValue& InDynamicValue) override;
+
 	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
-		const FString& InSection) override;
+		const FString& InSection,
+		FDynamicValue& InDynamicValue) override;
+
 	virtual uint32 MakeHash() const override;
 };
 
@@ -49,9 +64,16 @@ public:
 	double DoubleValue;
 
 public:
-	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection) override;
+	virtual void SetDefaultValue(FDynamicValue& InDynamicValue) override;
+	
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection,
+		const FDynamicValue& InDynamicValue) override;
+
 	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
-		const FString& InSection) override;
+		const FString& InSection,
+		FDynamicValue& InDynamicValue) override;
+
 	virtual uint32 MakeHash() const override;
 };
 
@@ -65,9 +87,15 @@ public:
 	int32 IntValue;
 
 public:
-	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection) override;
+	virtual void SetDefaultValue(FDynamicValue& InDynamicValue) override;
+	
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection,
+		const FDynamicValue& InDynamicValue) override;
+
 	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
-		const FString& InSection) override;
+		const FString& InSection,
+		FDynamicValue& InDynamicValue) override;
 	virtual uint32 MakeHash() const override;
 };
 
@@ -81,9 +109,15 @@ public:
 	int64 Int64Value;
 
 public:
-	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection) override;
+	virtual void SetDefaultValue(FDynamicValue& InDynamicValue) override;
+	
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection,
+		const FDynamicValue& InDynamicValue) override;
+
 	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
-		const FString& InSection) override;
+		const FString& InSection,
+		FDynamicValue& InDynamicValue) override;
 	virtual uint32 MakeHash() const override;
 };
 
@@ -97,9 +131,15 @@ public:
 	uint8 UintValue;
 
 public:
-	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection) override;
+	virtual void SetDefaultValue(FDynamicValue& InDynamicValue) override;
+	
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection,
+		const FDynamicValue& InDynamicValue) override;
+
 	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
-		const FString& InSection) override;
+		const FString& InSection,
+		FDynamicValue& InDynamicValue) override;
 	virtual uint32 MakeHash() const override;
 };
 
@@ -113,8 +153,14 @@ public:
 	FString StringValue;
 
 public:
-	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection) override;
+	virtual void SetDefaultValue(FDynamicValue& InDynamicValue) override;
+	
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
+		const FString& InSection,
+		const FDynamicValue& InDynamicValue) override;
+
 	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
-		const FString& InSection) override;
+		const FString& InSection,
+		FDynamicValue& InDynamicValue) override;
 	virtual uint32 MakeHash() const override;
 };

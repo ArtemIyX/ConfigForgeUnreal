@@ -33,12 +33,11 @@ void UConfigForgeCategoryRuntime::InitData(UConfigForgeCategory* InCategoryAsset
 		UConfigValueObject* fieldAsset = InCategoryAsset->Fields[i];
 		if (fieldAsset)
 		{
-			// TODO: Duplicate is not allowed in ASYNC thread
-			UConfigValueObject* runtimeValue = DuplicateObject(fieldAsset, this);
 			UConfigValueObjectRuntime* runtimeFieldObject = NewObject<UConfigValueObjectRuntime>(this);
 			runtimeFieldObject->Key = fieldAsset->Key;
-			runtimeFieldObject->Asset = fieldAsset;
-			runtimeFieldObject->RuntimeValue = runtimeValue;
+
+			// Set asset, set default value
+			runtimeFieldObject->ApplyAsset(fieldAsset);
 
 			FieldsRuntime.Add(TObjectPtr<UConfigValueObjectRuntime>(runtimeFieldObject));
 		}

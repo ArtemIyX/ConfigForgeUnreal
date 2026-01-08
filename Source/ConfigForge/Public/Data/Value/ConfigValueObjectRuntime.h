@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Misc/DynamicValue.h"
 #include "UObject/Object.h"
 #include "ConfigValueObjectRuntime.generated.h"
 
@@ -24,11 +25,10 @@ public:
 	UPROPERTY()
 	TWeakObjectPtr<UConfigValueObject> Asset;
 
-	// Runtime data
 	UPROPERTY()
-	TObjectPtr<UConfigValueObject> RuntimeValue;
-
+	FDynamicValue DynamicValue;
 public:
-	void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InFilePtr, const FString& InSection);
-	bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InFilePtr, const FString& InSection);
+	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InFilePtr, const FString& InSection);
+	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InFilePtr, const FString& InSection);
+	virtual void ApplyAsset(const TWeakObjectPtr<UConfigValueObject>& InAsset);
 };

@@ -3,15 +3,22 @@
 
 #include "Data/Value/ConfigValueObject.h"
 
-void UConfigValueObject::SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection)
+void UConfigValueObject::SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection,
+	const FDynamicValue& InDynamicValue)
 {
 	// Implement in child
 }
 
-bool UConfigValueObject::GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection)
+bool UConfigValueObject::GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile, const FString& InSection,
+	FDynamicValue& InDynamicValue)
 {
 	// Implement in child
 	return false;
+}
+
+void UConfigValueObject::SetDefaultValue(FDynamicValue& InDynamicValue)
+{
+	// Implement in child
 }
 
 uint32 UConfigValueObject::MakeHash() const

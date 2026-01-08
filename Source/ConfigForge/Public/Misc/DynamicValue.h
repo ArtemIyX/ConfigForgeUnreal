@@ -118,7 +118,7 @@ public:
 	}
 
 	// Check if a value is stored
-	bool IsValid() const
+	bool IsSet() const
 	{
 		return Holder.IsValid();
 	}

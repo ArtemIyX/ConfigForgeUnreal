@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Misc/ConfigForgeIniFile.h"
+#include "Misc/DynamicValue.h"
 #include "UObject/Object.h"
 #include "ConfigValueObject.generated.h"
 
@@ -21,12 +22,15 @@ public:
 	FString Key;
 
 public:
-	
 	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
-		const FString& InSection);
+		const FString& InSection,
+		const FDynamicValue& InDynamicValue);
 
 	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InConfigFile,
-		const FString& InSection);
+		const FString& InSection,
+		FDynamicValue& InDynamicValue);
+
+	virtual void SetDefaultValue(FDynamicValue& InDynamicValue);
 
 	virtual uint32 MakeHash() const;
 };

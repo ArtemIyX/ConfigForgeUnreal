@@ -7,22 +7,32 @@
 
 void UConfigValueObjectRuntime::SetToFile(const TSharedPtr<FConfigForgeIniFile>& InFilePtr, const FString& InSection)
 {
+	if (!Asset.IsValid())
+		return;
+
 	if (!InFilePtr.IsValid())
 		return;
 
-	if (!RuntimeValue)
+	// Value must be set to write to file
+	if (!DynamicValue.IsSet())
 		return;
 
-	RuntimeValue->SetToFile(InFilePtr, InSection);
+	Asset->SetToFile(InFilePtr, InSection, DynamicValue);
 }
 
 bool UConfigValueObjectRuntime::GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InFilePtr, const FString& InSection)
 {
+	if (!Asset.IsValid())
+		return false;
+
 	if (!InFilePtr.IsValid())
 		return false;
 
-	if (!RuntimeValue)
-		return false;
+	return Asset->GetFromFile(InFilePtr, InSection, DynamicValue);
+}
 
-	return RuntimeValue->GetFromFile(InFilePtr, InSection);
+void UConfigValueObjectRuntime::ApplyAsset(const TWeakObjectPtr<UConfigValueObject>& InAsset)
+{
+	Asset = InAsset;
+	Asset->SetDefaultValue(DynamicValue);
 }

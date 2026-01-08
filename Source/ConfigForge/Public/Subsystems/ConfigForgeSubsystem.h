@@ -240,6 +240,7 @@ protected:
 	bool LoadFileInternal(TSubclassOf<UConfigPathProvider> InPathProviderClass, const FGuid& InId, UConfigForgeFile* InTemplate, UConfigForgeFileRuntime*& OutFile);
 
 public:
+	#pragma region IO
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="I/O")
 	FORCEINLINE bool IsLoadingFiles() const { return bLoadingFiles; }
 
@@ -247,4 +248,6 @@ public:
 	bool LoadSingleFile(const FConfigForgeFileData& InFileData, UConfigForgeFileRuntime*& OutFile);
 
 	void LoadSingleFileAsync(const FConfigForgeFileData& InFileData, FLoadForgeFileDelegate Callback);
+
+	#pragma endregion
 };
