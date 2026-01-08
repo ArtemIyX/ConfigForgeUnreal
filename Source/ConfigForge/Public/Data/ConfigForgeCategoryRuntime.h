@@ -23,7 +23,7 @@ protected:
 	FName CategoryName;
 
 	UPROPERTY()
-	TArray<TObjectPtr<UConfigValueObjectRuntime>> FieldsRuntime;
+	TMap<FString, TObjectPtr<UConfigValueObjectRuntime>> FieldsRuntime;
 
 public:
 	UFUNCTION(BlueprintCallable, Category="Category")
@@ -34,8 +34,12 @@ public:
 
 	void GetFields(TArray<TWeakObjectPtr<UConfigValueObjectRuntime>>& OutResult) const;
 
-	UFUNCTION(BlueprintCallable, Category="Category")
+	UFUNCTION(BlueprintCallable, DisplayName="Get All Fields", Category="Category")
 	void BP_GetFields(TArray<UConfigValueObjectRuntime*>& OutResult) const;
+
+	UFUNCTION(BlueprintCallable, Category="Category")
+	bool GetField(const FString& InKey, UConfigValueObjectRuntime*& OutField) const;
+
 public:
 	void InitData(UConfigForgeCategory* InCategoryAsset);
 

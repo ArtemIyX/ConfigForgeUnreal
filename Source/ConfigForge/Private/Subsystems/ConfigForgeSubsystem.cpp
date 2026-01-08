@@ -278,6 +278,73 @@ bool UConfigForgeSubsystem::GetRuntimeCategory_ID(const FGuid& InFileId, const F
 	return GetRuntimeCategory(runtimeFile, InCategoryName, OutCategory);
 }
 
+bool UConfigForgeSubsystem::GetRuntimeField(const UConfigForgeCategoryRuntime* InRuntimeCategory, const FString& InKey, UConfigValueObjectRuntime*& OutField)
+{
+	if (InRuntimeCategory == nullptr)
+		return false;
+
+	return InRuntimeCategory->GetField(InKey, OutField);
+}
+
+bool UConfigForgeSubsystem::GetRuntimeField_File(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, const FString& InKey, UConfigValueObjectRuntime*& OutField)
+{
+	if (InConfigFile == nullptr)
+		return false;
+
+	UConfigForgeCategoryRuntime* category;
+	if (!GetRuntimeCategory(InConfigFile, InCategoryName, category))
+		return false;
+
+	return GetRuntimeField(category, InKey, OutField);
+}
+
+bool UConfigForgeSubsystem::GetRuntimeField_ID(const FGuid& InFileID, const FName& InCategoryName, const FString& InKey, UConfigValueObjectRuntime*& OutField)
+{
+	UConfigForgeFileRuntime* file;
+	if (!GetRuntimeFile(InFileID, file))
+		return false;
+
+	UConfigForgeCategoryRuntime* category;
+	if (!GetRuntimeCategory(file, InCategoryName, category))
+		return false;
+
+	return GetRuntimeField(category, InKey, OutField);
+}
+
+bool UConfigForgeSubsystem::GetRuntimeFields(const UConfigForgeCategoryRuntime* InRuntimeCategory, TArray<UConfigValueObjectRuntime*>& OutFields)
+{
+	if (InRuntimeCategory == nullptr)
+		return false;
+
+	InRuntimeCategory->BP_GetFields(OutFields);
+	return true;
+}
+
+bool UConfigForgeSubsystem::GetRuntimeFields_File(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, TArray<UConfigValueObjectRuntime*>& OutFields)
+{
+	if (InConfigFile == nullptr)
+		return false;
+
+	UConfigForgeCategoryRuntime* category;
+	if (!GetRuntimeCategory(InConfigFile, InCategoryName, category))
+		return false;
+
+	return GetRuntimeFields(category, OutFields);
+}
+
+bool UConfigForgeSubsystem::GetRuntimeFields_ID(const FGuid& InFileID, const FName& InCategoryName, TArray<UConfigValueObjectRuntime*>& OutFields)
+{
+	UConfigForgeFileRuntime* file;
+	if (!GetRuntimeFile(InFileID, file))
+		return false;
+
+	UConfigForgeCategoryRuntime* category;
+	if (!GetRuntimeCategory(file, InCategoryName, category))
+		return false;
+
+	return GetRuntimeFields(category, OutFields);
+}
+
 
 #pragma endregion
 

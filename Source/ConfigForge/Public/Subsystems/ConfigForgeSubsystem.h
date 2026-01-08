@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/ConfigForgeCategoryRuntime.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "ConfigForgeSubsystem.generated.h"
 
@@ -271,6 +272,23 @@ public:
 	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime Category (By File ID)", Category="Runtime")
 	bool GetRuntimeCategory_ID(const FGuid& InFileId, const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory);
 
+	UFUNCTION(BlueprintCallable, Category="Runtime")
+	bool GetRuntimeField(const UConfigForgeCategoryRuntime* InRuntimeCategory, const FString& InKey, UConfigValueObjectRuntime*& OutField);
+
+	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime Field (From File Object)", Category="Runtime")
+	bool GetRuntimeField_File(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, const FString& InKey, UConfigValueObjectRuntime*& OutField);
+
+	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime Field (By File ID)", Category="Runtime")
+	bool GetRuntimeField_ID(const FGuid& InFileID, const FName& InCategoryName, const FString& InKey, UConfigValueObjectRuntime*& OutField);
+
+	UFUNCTION(BlueprintCallable, Category="Runtime")
+	bool GetRuntimeFields(const UConfigForgeCategoryRuntime* InRuntimeCategory, TArray<UConfigValueObjectRuntime*>& OutFields);
+
+	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime All Fields (From File Object)", Category="Runtime")
+	bool GetRuntimeFields_File(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, TArray<UConfigValueObjectRuntime*>& OutFields);
+
+	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime All Fields (By File ID)", Category="Runtime")
+	bool GetRuntimeFields_ID(const FGuid& InFileID, const FName& InCategoryName, TArray<UConfigValueObjectRuntime*>& OutFields);
 	#pragma endregion
 
 public:

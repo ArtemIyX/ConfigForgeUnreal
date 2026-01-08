@@ -12,7 +12,7 @@ class UConfigValueObject;
 /**
  * 
  */
-UCLASS(NotBlueprintable, NotBlueprintType)
+UCLASS(Blueprintable, BlueprintType)
 class CONFIGFORGE_API UConfigValueObjectRuntime : public UObject
 {
 	GENERATED_BODY()
@@ -27,6 +27,17 @@ public:
 
 	UPROPERTY()
 	FDynamicValue DynamicValue;
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="ConfigValue")
+	FORCEINLINE FString GetKey() const { return Key; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="ConfigValue")
+	FORCEINLINE UConfigValueObject* GetAsset() const { return Asset.Get(); }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="ConfigValue")
+	FORCEINLINE FDynamicValue GetDynamicValue() const { return DynamicValue; }
+
 public:
 	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InFilePtr, const FString& InSection);
 	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InFilePtr, const FString& InSection);

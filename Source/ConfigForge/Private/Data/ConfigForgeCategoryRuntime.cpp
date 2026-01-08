@@ -11,11 +11,11 @@ void UConfigForgeCategoryRuntime::GetFields(TArray<TWeakObjectPtr<UConfigValueOb
 	OutResult.Empty();
 	const int32 n = FieldsRuntime.Num();
 	OutResult.Reserve(n);
-	for (int32 i = 0; i < n; ++i)
+	for (const TPair<FString, TObjectPtr<UConfigValueObjectRuntime>>& pair : FieldsRuntime)
 	{
-		if (FieldsRuntime[i])
+		if (pair.Value)
 		{
-			OutResult.Add(TWeakObjectPtr<UConfigValueObjectRuntime>(FieldsRuntime[i].Get()));
+			OutResult.Add(pair.Value);
 		}
 	}
 }
@@ -25,13 +25,23 @@ void UConfigForgeCategoryRuntime::BP_GetFields(TArray<UConfigValueObjectRuntime*
 	OutResult.Empty();
 	const int32 n = FieldsRuntime.Num();
 	OutResult.Reserve(n);
-	for (int32 i = 0; i < n; ++i)
+	for (const TPair<FString, TObjectPtr<UConfigValueObjectRuntime>>& pair : FieldsRuntime)
 	{
-		if (FieldsRuntime[i])
+		if (pair.Value)
 		{
-			OutResult.Add(FieldsRuntime[i].Get());
+			OutResult.Add(pair.Value);
 		}
 	}
+}
+
+bool UConfigForgeCategoryRuntime::GetField(const FString& InKey, UConfigValueObjectRuntime*& OutField) const
+{
+	const TObjectPtr<UConfigValueObjectRuntime>* itemPtr = FieldsRuntime.Find(InKey);
+	if (itemPtr == nullptr)
+		return false;
+
+	OutField = *itemPtr;
+	return IsValid(OutField);
 }
 
 void UConfigForgeCategoryRuntime::InitData(UConfigForgeCategory* InCategoryAsset)
@@ -53,7 +63,7 @@ void UConfigForgeCategoryRuntime::InitData(UConfigForgeCategory* InCategoryAsset
 			// Set asset, set default value
 			runtimeFieldObject->ApplyAsset(fieldAsset);
 
-			FieldsRuntime.Add(TObjectPtr<UConfigValueObjectRuntime>(runtimeFieldObject));
+			FieldsRuntime.Add(fieldAsset->Key, TObjectPtr<UConfigValueObjectRuntime>(runtimeFieldObject));
 		}
 	}
 }
@@ -61,13 +71,12 @@ void UConfigForgeCategoryRuntime::InitData(UConfigForgeCategory* InCategoryAsset
 void UConfigForgeCategoryRuntime::BeginDestroy()
 {
 	const int32 n = FieldsRuntime.Num();
-	for (int i = 0; i < n; ++i)
+	for (TPair<FString, TObjectPtr<UConfigValueObjectRuntime>> pair : FieldsRuntime)
 	{
-		if (FieldsRuntime[i])
+		if (pair.Value)
 		{
-			FieldsRuntime[i]->ConditionalBeginDestroy();
+			pair.Value->ConditionalBeginDestroy();
 		}
-		FieldsRuntime[i] = nullptr;
 	}
 	FieldsRuntime.Empty();
 	Super::BeginDestroy();
