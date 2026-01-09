@@ -10,6 +10,9 @@
 class UConfigForgeCategoryRuntime;
 class FConfigForgeIniFile;
 class UConfigValueObject;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FConfigValueChangedDelegate, UConfigValueObjectRuntime*, Object, const FDynamicValue&, Value);
+
 /**
  * 
  */
@@ -52,4 +55,8 @@ public:
 	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InFilePtr, const FString& InSection);
 	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InFilePtr, const FString& InSection);
 	virtual void ApplyAsset(const TWeakObjectPtr<UConfigValueObject>& InAsset);
+
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Config Value")
+	FConfigValueChangedDelegate OnValueChanged;
 };
