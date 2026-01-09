@@ -694,6 +694,10 @@ bool UConfigForgeSubsystem::LoadAllFiles(TArray<UConfigForgeFileRuntime*>& OutFi
 
 	bOperatingFiles = false;
 
+	for (int32 i = 0; i < OutFiles.Num(); ++i)
+	{
+		OnFileLoaded.Broadcast(OutFiles[i]);
+	}
 	OnAllFilesLoaded.Broadcast();
 
 	return bSuccess;
@@ -722,6 +726,10 @@ void UConfigForgeSubsystem::LoadAllFilesAsync(FLoadAllForgeFileDelegate Callback
 		const bool bSuccess = LoadAllFilesInternal(arr, res);
 		bOperatingFiles = false;
 		AsyncTask(ENamedThreads::GameThread, [this, res, bSuccess, Callback]() {
+			for (int32 i = 0; i < res.Num(); ++i)
+			{
+				OnFileLoaded.Broadcast(res[i]);
+			}
 			OnAllFilesLoaded.Broadcast();
 			Callback.ExecuteIfBound(bSuccess, res);
 		});
@@ -791,6 +799,11 @@ bool UConfigForgeSubsystem::SaveAllFiles()
 	bool bSuccess = WriteAllFilesInternal(arr);
 	bOperatingFiles = false;
 
+	for (int i = 0; i < arr.Num(); ++i)
+	{
+		OnFileSaved.Broadcast(arr[i]);
+	}
+
 	OnAllFilesSaved.Broadcast();
 	return bSuccess;
 }
@@ -816,7 +829,11 @@ void UConfigForgeSubsystem::SaveAllFilesAsync(FSaveAllForgeFileDelegate Callback
 	Async(EAsyncExecution::TaskGraph, [this, arr, Callback]() {
 		bool bSuccess = WriteAllFilesInternal(arr);
 		bOperatingFiles = false;
-		AsyncTask(ENamedThreads::GameThread, [this, bSuccess, Callback]() {
+		AsyncTask(ENamedThreads::GameThread, [this,arr, bSuccess, Callback]() {
+			for (int i = 0; i < arr.Num(); ++i)
+			{
+				OnFileSaved.Broadcast(arr[i]);
+			}
 			OnAllFilesSaved.Broadcast();
 			Callback.ExecuteIfBound(bSuccess);
 		});

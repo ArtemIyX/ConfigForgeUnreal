@@ -602,9 +602,45 @@ public:
 	 */
 	void SaveAllFilesAsync(FSaveAllForgeFileDelegate Callback);
 
+	/**
+	 * @brief Synchronously saves the specified files to disk
+	 *
+	 * Saves all valid files from the provided GUID array.
+	 * Operation is performed immediately on the calling thread (usually game thread).
+	 *
+	 * @note This function blocks until all file operations are complete
+	 * @note If any file operation fails, function still tries to save remaining files
+	 *
+	 * @param InFiles Array of file GUIDs to save
+	 * @return true if all file write operations were successful, false otherwise
+	 *         (or if no files were valid / operation was already in progress)
+	 *
+	 * @see SaveSelectedFiles(const TArray<FGuid>&, FSaveSelectedForgeFileDelegate)
+	 * @see OnFileSaved
+	 */
 	UFUNCTION(BlueprintCallable, Category="I/O")
 	bool SaveSelectedFiles(const TArray<FGuid>& InFiles);
 
+	/**
+	 * @brief Asynchronously saves the specified files and calls delegate upon completion
+	 *
+	 * Performs file saving on a background thread.
+	 * After all operations are finished, broadcasts OnFileSaved for each file
+	 * and executes the provided callback on the game thread.
+	 *
+	 * @note If operation is already in progress (bOperatingFiles == true),
+	 *       callback is immediately executed with success = false
+	 * @note If input array is empty or contains no valid files,
+	 *       callback is immediately executed with success = false
+	 *
+	 * @param InFiles Array of file GUIDs to save
+	 * @param Callback Delegate that will be called on game thread when operation completes
+	 *                 Signature: void(bool bSuccess, const TArray<UConfigForgeFileRuntime*>& SavedFiles)
+	 *
+	 * @see SaveSelectedFiles(const TArray<FGuid>&)
+	 * @see OnFileSaved
+	 * @see FSaveSelectedForgeFileDelegate
+	 */
 	void SaveSelectedFiles(const TArray<FGuid>& InFiles, FSaveSelectedForgeFileDelegate Callback);
 	
 	#pragma endregion
