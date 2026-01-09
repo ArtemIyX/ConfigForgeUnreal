@@ -36,6 +36,7 @@ void UConfigForgeFileRuntime::InitDefaultData()
 		{
 			UConfigForgeCategoryRuntime* runtimeCategory = NewObject<UConfigForgeCategoryRuntime>(this);
 			runtimeCategory->InitData(FileAsset->Categories[i]);
+			runtimeCategory->SetFileOwner(this);
 			CategoriesRuntime.Add(runtimeCategory->GetCategoryName(), runtimeCategory);
 		}
 	}

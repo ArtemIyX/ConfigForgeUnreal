@@ -6,6 +6,7 @@
 
 #include "ConfigForgeCategoryRuntime.generated.h"
 
+class UConfigForgeFileRuntime;
 class UConfigForgeCategory;
 class UConfigValueObjectRuntime;
 /**
@@ -26,11 +27,17 @@ protected:
 	UPROPERTY()
 	TMap<FString, TObjectPtr<UConfigValueObjectRuntime>> FieldsRuntime;
 
+	UPROPERTY()
+	TWeakObjectPtr<UConfigForgeFileRuntime> File;
+
 public:
-	UFUNCTION(BlueprintCallable, Category="Category")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Category")
+	FORCEINLINE UConfigForgeFileRuntime* GetFile() { return File.Get(); }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Category")
 	FORCEINLINE FName GetCategoryName() const { return CategoryName; }
 
-	UFUNCTION(BlueprintCallable, Category="Category")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Category")
 	FORCEINLINE UConfigForgeCategory* GetCategoryAsset() const { return CategoryAsset.Get(); }
 
 	void GetFields(TArray<TWeakObjectPtr<UConfigValueObjectRuntime>>& OutResult) const;
@@ -43,6 +50,7 @@ public:
 
 public:
 	void InitData(UConfigForgeCategory* InCategoryAsset);
+	void SetFileOwner(UConfigForgeFileRuntime* InFile) { File = InFile; }
 
 public:
 	virtual void BeginDestroy() override;

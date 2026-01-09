@@ -7,6 +7,7 @@
 #include "UObject/Object.h"
 #include "ConfigValueObjectRuntime.generated.h"
 
+class UConfigForgeCategoryRuntime;
 class FConfigForgeIniFile;
 class UConfigValueObject;
 /**
@@ -28,7 +29,13 @@ public:
 	UPROPERTY()
 	FDynamicValue DynamicValue;
 
+	UPROPERTY()
+	TWeakObjectPtr<UConfigForgeCategoryRuntime> Category;
+
 public:
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="ConfigValue")
+	FORCEINLINE UConfigForgeCategoryRuntime* GetCategory() const { return Category.Get(); }
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="ConfigValue")
 	FORCEINLINE FString GetKey() const { return Key; }
 
@@ -40,7 +47,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="ConfigValue")
 	virtual void SetDynamicValue(const FDynamicValue& InValue);
-	
+
 public:
 	virtual void SetToFile(const TSharedPtr<FConfigForgeIniFile>& InFilePtr, const FString& InSection);
 	virtual bool GetFromFile(const TSharedPtr<FConfigForgeIniFile>& InFilePtr, const FString& InSection);

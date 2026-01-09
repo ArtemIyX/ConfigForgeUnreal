@@ -60,7 +60,7 @@ void UConfigForgeCategoryRuntime::InitData(UConfigForgeCategory* InCategoryAsset
 		{
 			UConfigValueObjectRuntime* runtimeFieldObject = NewObject<UConfigValueObjectRuntime>(this);
 			runtimeFieldObject->Key = fieldAsset->Key;
-
+			runtimeFieldObject->Category = this;
 			// Set asset, set default value
 			runtimeFieldObject->ApplyAsset(fieldAsset);
 
