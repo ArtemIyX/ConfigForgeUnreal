@@ -3,8 +3,9 @@
 Plugin that offers a comprehensive system for managing game configurations. It breaks down game configurations into files, categories, and properties that can be easily accessed for both default game configurations, which are asset-based, and saved game configurations, which are stored on disk using a GameInstance system. The plugin supports synchronous or asynchronous loading or saving, offers flexible paths for saving, exposes functions to Blueprints, and offers functionality to be modified at runtime.
 
 ## Docs - MUST READ ☢️
-⚠️ [MkDocs](https://artemiyx.github.io/riftborn-doc/plugins/config-forge/)
+⚠️ [DOCS](https://artemiyx.github.io/riftborn-doc/plugins/config-forge/)
 
+☣️ [DOXYGEN](https://artemiyx.github.io/ConfigForgeUnrealDoc/)
 ## Quick Guide
 
 Install plugin in ``ProjectDir/Plugins/``
