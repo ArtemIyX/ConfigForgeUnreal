@@ -22,6 +22,9 @@ DECLARE_DELEGATE_TwoParams(FLoadForgeFileDelegate, bool, UConfigForgeFileRuntime
 DECLARE_DELEGATE_OneParam(FSaveForgeFileDelegate, bool);
 DECLARE_DELEGATE_TwoParams(FLoadAllForgeFileDelegate, bool, const TArray<UConfigForgeFileRuntime*>&);
 DECLARE_DELEGATE_OneParam(FSaveAllForgeFileDelegate, bool);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FConfigForgeSubsystemDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FConfigForgeSubsystemFileDelegate, UConfigForgeFileRuntime*, InFile);
 /**
  * @class UConfigForgeSubsystem
  * @brief Game instance subsystem for managing configuration files and categories in the ConfigForge plugin.
@@ -597,4 +600,21 @@ public:
 	 */
 	void SaveAllFilesAsync(FSaveAllForgeFileDelegate Callback);
 	#pragma endregion
+
+public:
+	#pragma region Events
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FConfigForgeSubsystemFileDelegate OnFileLoaded;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FConfigForgeSubsystemFileDelegate OnFileSaved;
+	
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FConfigForgeSubsystemDelegate OnAllFilesLoaded;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FConfigForgeSubsystemDelegate OnAllFilesSaved;
+	
+	#pragma endregion 
 };
