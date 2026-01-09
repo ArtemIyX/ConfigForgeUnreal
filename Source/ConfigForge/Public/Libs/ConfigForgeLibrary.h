@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Data/ConfigForgeSetup.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Misc/DynamicValue.h"
 #include "ConfigForgeLibrary.generated.h"
 
+struct FConfigForgeFileData;
 /**
  * @brief Blueprint function library for ConfigForge operations.
  * @note Used in K2 nodes

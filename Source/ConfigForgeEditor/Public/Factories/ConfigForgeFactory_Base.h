@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "ClassViewerFilter.h"
-#include "Factories/BlueprintFactory.h"
 #include "ConfigForgeFactory_Base.generated.h"
 
 class FForgeConfigClassViewFilter : public IClassViewerFilter

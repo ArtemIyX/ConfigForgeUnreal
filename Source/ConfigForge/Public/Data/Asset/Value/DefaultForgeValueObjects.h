@@ -3,8 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Data/Value/ConfigValueObject.h"
-
+#include "ConfigValueObject.h"
 #include "DefaultForgeValueObjects.generated.h"
 
 UCLASS(Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNew)

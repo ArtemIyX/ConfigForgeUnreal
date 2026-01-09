@@ -2,8 +2,8 @@
 
 
 #include "Factories/PathProviderFactory.h"
-#include "AssetToolsModule.h"
-#include "Data/ConfigPathProvider.h"
+#include "Data/User/ConfigPathProvider.h"
+
 
 UPathProviderFactory::UPathProviderFactory()
 {

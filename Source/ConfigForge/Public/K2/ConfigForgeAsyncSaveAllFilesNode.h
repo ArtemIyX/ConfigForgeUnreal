@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
-#include "UObject/Object.h"
 #include "ConfigForgeAsyncSaveAllFilesNode.generated.h"
 
 class UConfigForgeFileRuntime;

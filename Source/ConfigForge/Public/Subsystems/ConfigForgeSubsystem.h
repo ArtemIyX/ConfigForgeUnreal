@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Data/ConfigForgeCategoryRuntime.h"
+
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "ConfigForgeSubsystem.generated.h"
 

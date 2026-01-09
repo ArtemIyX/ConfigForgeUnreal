@@ -1,11 +1,12 @@
 ﻿// © Artem Podorozhko. All Rights Reserved. This project, including all associated assets, code, and content, is the property of Artem Podorozhko. Unauthorized use, distribution, or modification is strictly prohibited.
 
 
-#include "Data/ConfigForgeFileRuntime.h"
+#include "Data/Runtime/ConfigForgeFileRuntime.h"
 
-#include "Data/ConfigForgeCategoryRuntime.h"
-#include "Data/ConfigPathProvider.h"
-#include "Data/Value/ConfigValueObjectRuntime.h"
+#include "Data/Asset/ConfigForgeFile.h"
+#include "Data/Runtime/ConfigForgeCategoryRuntime.h"
+#include "Data/Runtime/ConfigValueObjectRuntime.h"
+#include "Data/User/ConfigPathProvider.h"
 #include "Misc/ConfigForgeIniFile.h"
 
 UConfigForgeFileRuntime::UConfigForgeFileRuntime() {}

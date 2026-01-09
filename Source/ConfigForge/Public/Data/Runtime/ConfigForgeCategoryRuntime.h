@@ -3,9 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ConfigForgeCategory.h"
+
 #include "ConfigForgeCategoryRuntime.generated.h"
 
+class UConfigForgeCategory;
 class UConfigValueObjectRuntime;
 /**
  * 

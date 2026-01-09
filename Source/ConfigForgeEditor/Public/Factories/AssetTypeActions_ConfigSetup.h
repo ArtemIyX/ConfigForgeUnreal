@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "AssetTypeActions_ConfigForge.h"
-#include "Data/ConfigForgeSetup.h"
+#include "Data/Asset/ConfigForgeSetup.h"
+
 
 class CONFIGFORGEEDITOR_API FAssetTypeActions_ConfigSetup : public FAssetTypeActions_ConfigForge
 {

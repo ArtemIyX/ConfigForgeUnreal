@@ -2,8 +2,7 @@
 
 
 #include "Factories/MetaDataObjectFactory.h"
-
-#include "Data/ConfigForgeMetaDataObject.h"
+#include "Data/User/ConfigForgeMetaDataObject.h"
 
 UMetaDataObjectFactory::UMetaDataObjectFactory()
 {

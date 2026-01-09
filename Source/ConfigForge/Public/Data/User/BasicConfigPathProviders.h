@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Data/ConfigPathProvider.h"
+#include "ConfigPathProvider.h"
+
 #include "BasicConfigPathProviders.generated.h"
 
 UCLASS(Blueprintable, BlueprintType, DisplayName="GeneratedConfigDir")

@@ -4,8 +4,8 @@
 #include "Libs/ConfigForgeLibrary.h"
 
 #include "ConfigForge.h"
+#include "Data/Asset/ConfigForgeSetup.h"
 #include "Subsystems/ConfigForgeSubsystem.h"
-
 
 bool UConfigForgeLibrary::GetConfigForgeFile(const UObject* WorldContextObject, const FString& InFileName, FConfigForgeFileData& OutFileData)
 {

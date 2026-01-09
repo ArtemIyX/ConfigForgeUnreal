@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
-#include "UObject/Object.h"
 #include "ConfigForgeAsyncSaveFileNode.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnConfigForgeFileSaved);

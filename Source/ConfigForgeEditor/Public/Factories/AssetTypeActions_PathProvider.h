@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AssetTypeActions_ConfigForge.h"
-#include "Data/ConfigPathProvider.h"
+#include "Data/User/ConfigPathProvider.h"
 
 
 class CONFIGFORGEEDITOR_API FAssetTypeActions_PathProvider : public FAssetTypeActions_ConfigForge

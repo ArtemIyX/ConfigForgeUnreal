@@ -1,7 +1,9 @@
 ﻿#pragma once
+
 #include "CoreMinimal.h"
 #include "AssetTypeActions_ConfigForge.h"
-#include "Data/ConfigForgeMetaDataObject.h"
+#include "Data/User/ConfigForgeMetaDataObject.h"
+
 
 class CONFIGFORGEEDITOR_API FAssetTypeActions_MetaObject : public FAssetTypeActions_ConfigForge
 {

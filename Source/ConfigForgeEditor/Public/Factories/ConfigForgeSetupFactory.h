@@ -3,8 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ConfigForgeFactory_Base.h"
-#include "Factories/BlueprintFactory.h"
 #include "ConfigForgeSetupFactory.generated.h"
 
 /**

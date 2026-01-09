@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ConfigForgeFile.h"
 #include "ConfigForgeFileRuntime.generated.h"
 
+class UConfigForgeFile;
 class FConfigForgeIniFile;
 class UConfigForgeCategoryRuntime;
 class UConfigPathProvider;

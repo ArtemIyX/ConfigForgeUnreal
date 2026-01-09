@@ -2,8 +2,7 @@
 
 
 #include "Factories/ConfigForgeSetupFactory.h"
-
-#include "Data/ConfigForgeSetup.h"
+#include "Data/Asset/ConfigForgeSetup.h"
 
 UConfigForgeSetupFactory::UConfigForgeSetupFactory()
 {
