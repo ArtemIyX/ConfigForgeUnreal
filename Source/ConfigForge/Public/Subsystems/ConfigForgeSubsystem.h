@@ -103,7 +103,7 @@ protected:
 	FThreadSafeBool bOperatingFiles;
 
 public:
-	#pragma region Get
+	#pragma region Asset
 	/**
 	 * @brief Gets the developer settings for the ConfigForge system.
 	 * 
@@ -272,7 +272,7 @@ public:
 	 * @return True if categories were found, false if the file is invalid or contains no categories.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Runtime")
-	bool GetRuntimeCategories(const UConfigForgeFileRuntime* InConfigFile, TArray<UConfigForgeCategoryRuntime*>& OutCategories);
+	bool GetRuntimeCategories(const UConfigForgeFileRuntime* InConfigFile, TArray<UConfigForgeCategoryRuntime*>& OutCategories) const;
 
 	/**
 	 * @brief Retrieves all categories from a runtime configuration file identified by its GUID.
@@ -281,7 +281,7 @@ public:
 	 * @return True if the file was found and categories were retrieved, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime Categories (By File ID)", Category="Runtime")
-	bool GetRuntimeCategories_ID(const FGuid& InFileId, TArray<UConfigForgeCategoryRuntime*>& OutCategories);
+	bool GetRuntimeCategories_ID(const FGuid& InFileId, TArray<UConfigForgeCategoryRuntime*>& OutCategories) const;
 
 	/**
 	 * @brief Retrieves a specific category by name from a runtime configuration file.
@@ -291,7 +291,7 @@ public:
 	 * @return True if the category was found, false if the file is invalid or the category doesn't exist.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Runtime")
-	bool GetRuntimeCategory(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory);
+	bool GetRuntimeCategory(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory) const;
 
 	/**
 	 * @brief Retrieves a specific category by name from a runtime configuration file identified by its GUID.
@@ -301,7 +301,7 @@ public:
 	 * @return True if the file and category were found, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime Category (By File ID)", Category="Runtime")
-	bool GetRuntimeCategory_ID(const FGuid& InFileId, const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory);
+	bool GetRuntimeCategory_ID(const FGuid& InFileId, const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory) const;
 
 	/**
 	 * @brief Retrieves a specific field by key from a runtime category.
@@ -310,8 +310,31 @@ public:
 	 * @param OutField [out] Pointer to the retrieved field value object if found.
 	 * @return True if the field was found, false if the category is invalid or the field doesn't exist.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Runtime")
-	bool GetRuntimeField(const UConfigForgeCategoryRuntime* InRuntimeCategory, const FString& InKey, UConfigValueObjectRuntime*& OutField);
+	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime Field (By Object)", Category="Runtime")
+	bool GetRuntimeField(const UConfigForgeCategoryRuntime* InRuntimeCategory, const FString& InKey, UConfigValueObjectRuntime*& OutField) const;
+
+	/**
+	 * @brief Retrieves a runtime field by providing its file ID, category name, and field name.
+	 * 
+	 * This function performs a full lookup: first finding the file by ID, then the category within that file,
+	 * and finally the specific field within the category. All three output pointers are set if successful.
+	 * 
+	 * @param InFiledId       The unique GUID of the config file containing the field.
+	 * @param InCategoryName  The name of the category containing the field.
+	 * @param InFieldName     The name of the field to retrieve.
+	 * @param OutFile         [out] Pointer to the runtime file object if found (nullptr otherwise).
+	 * @param OutCategory     [out] Pointer to the runtime category object if found (nullptr otherwise).
+	 * @param OutField        [out] Pointer to the runtime field value object if found (nullptr otherwise).
+	 * 
+	 * @return true if the file, category, and field were all successfully found and are valid; false otherwise.
+	 * 
+	 * @note This is a Blueprint-callable function (exposed as "Get Runtime Field").
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime Field", Category="Runtime")
+	bool GetRuntimeField_Full(const FGuid& InFiledId, const FName& InCategoryName, const FString& InFieldName,
+		UConfigForgeFileRuntime*& OutFile,
+		UConfigForgeCategoryRuntime*& OutCategory,
+		UConfigValueObjectRuntime*& OutField) const;
 
 	/**
 	 * @brief Retrieves a specific field by key from a category within a runtime configuration file.
@@ -322,7 +345,7 @@ public:
 	 * @return True if the file, category, and field were found, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime Field (From File Object)", Category="Runtime")
-	bool GetRuntimeField_File(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, const FString& InKey, UConfigValueObjectRuntime*& OutField);
+	bool GetRuntimeField_File(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, const FString& InKey, UConfigValueObjectRuntime*& OutField) const;
 
 	/**
 	 * @brief Retrieves a specific field by key from a category within a runtime configuration file identified by its GUID.
@@ -333,7 +356,7 @@ public:
 	 * @return True if the file, category, and field were found, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime Field (By File ID)", Category="Runtime")
-	bool GetRuntimeField_ID(const FGuid& InFileID, const FName& InCategoryName, const FString& InKey, UConfigValueObjectRuntime*& OutField);
+	bool GetRuntimeField_ID(const FGuid& InFileID, const FName& InCategoryName, const FString& InKey, UConfigValueObjectRuntime*& OutField) const;
 
 	/**
 	 * @brief Retrieves all fields from a runtime category.
@@ -343,7 +366,7 @@ public:
 	 * @note Returns true even if the category contains no fields.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Runtime")
-	bool GetRuntimeFields(const UConfigForgeCategoryRuntime* InRuntimeCategory, TArray<UConfigValueObjectRuntime*>& OutFields);
+	bool GetRuntimeFields(const UConfigForgeCategoryRuntime* InRuntimeCategory, TArray<UConfigValueObjectRuntime*>& OutFields) const;
 
 	/**
 	 * @brief Retrieves all fields from a category within a runtime configuration file.
@@ -353,7 +376,7 @@ public:
 	 * @return True if the file and category were found, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime All Fields (From File Object)", Category="Runtime")
-	bool GetRuntimeFields_File(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, TArray<UConfigValueObjectRuntime*>& OutFields);
+	bool GetRuntimeFields_File(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, TArray<UConfigValueObjectRuntime*>& OutFields) const;
 
 	/**
 	 * @brief Retrieves all fields from a category within a runtime configuration file identified by its GUID.
@@ -363,7 +386,9 @@ public:
 	 * @return True if the file and category were found, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName="Get Runtime All Fields (By File ID)", Category="Runtime")
-	bool GetRuntimeFields_ID(const FGuid& InFileID, const FName& InCategoryName, TArray<UConfigValueObjectRuntime*>& OutFields);
+	bool GetRuntimeFields_ID(const FGuid& InFileID, const FName& InCategoryName, TArray<UConfigValueObjectRuntime*>& OutFields) const;
+
+
 	#pragma endregion
 
 public:
@@ -401,8 +426,28 @@ protected:
 	 */
 	bool WriteFileInternal(UConfigForgeFileRuntime* InFile);
 
+	/**
+	 * @brief Internal helper that loads multiple config files from structured data into runtime objects.
+	 * 
+	 * Iterates over the provided array of file data and attempts to read each file using ReadFileInternal.
+	 * Successfully loaded runtime files are added to OutFiles.
+	 * 
+	 * @param InDataArr  Array of file metadata and content to load.
+	 * @param OutFiles   [out] Array of successfully created runtime file objects.
+	 * 
+	 * @return true if all files were loaded successfully; false if any failed (partial success still populates OutFiles).
+	 */
 	bool LoadAllFilesInternal(const TArray<FConfigForgeFileData>& InDataArr, TArray<UConfigForgeFileRuntime*>& OutFiles);
 
+	/**
+	 * @brief Internal helper that writes multiple runtime config files to disk.
+	 * 
+	 * Iterates over the provided runtime files and calls WriteFileInternal on each valid one.
+	 * 
+	 * @param InFiles  Array of runtime file objects to write.
+	 * 
+	 * @return true if all valid files were written successfully; false if any write operation failed.
+	 */
 	bool WriteAllFilesInternal(const TArray<UConfigForgeFileRuntime*>& InFiles);
 
 public:
@@ -495,11 +540,35 @@ public:
 	 */
 	void LoadAllFilesAsync(FLoadAllForgeFileDelegate Callback);
 
+	/**
+	 * @brief Synchronously loads a selected subset of config files into runtime objects.
+	 * 
+	 * This is a thread-safe wrapper around LoadAllFilesInternal that prevents concurrent file operations
+	 * via the bOperatingFiles flag.
+	 * 
+	 * @param InFiles    Array of file data describing which files to load.
+	 * @param OutFiles   [out] Array of loaded runtime file objects (empty on failure).
+	 * 
+	 * @return true if loading completed successfully; false if already operating on files or if loading failed.
+	 * 
+	 * @note Blueprint callable.
+	 */
 	UFUNCTION(BlueprintCallable, Category="I/O")
 	bool LoadSelectedFiles(const TArray<FConfigForgeFileData>& InFiles, TArray<UConfigForgeFileRuntime*>& OutFiles);
-	
+
+	/**
+	 * @brief Asynchronously loads a selected subset of config files into runtime objects.
+	 * 
+	 * Runs the loading process on the task graph thread and executes the provided callback on the game thread
+	 * when complete. Prevents concurrent operations using bOperatingFiles.
+	 * 
+	 * If a file operation is already in progress, the callback is immediately invoked with failure.
+	 * 
+	 * @param InFiles    Array of file data describing which files to load.
+	 * @param Callback   Delegate called on the game thread when loading finishes. Parameters: (bool bSuccess, TArray<UConfigForgeFileRuntime*> LoadedFiles).
+	 */
 	void LoadSelectedFilesAsync(const TArray<FConfigForgeFileData>& InFiles, FLoadAllForgeFileDelegate Callback);
-	
+
 	/**
 	 * @brief Saves all currently loaded runtime configuration files synchronously.
 	 *

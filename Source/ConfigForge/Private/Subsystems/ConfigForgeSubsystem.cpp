@@ -236,7 +236,7 @@ void UConfigForgeSubsystem::GetAllRuntimeFiles(TArray<UConfigForgeFileRuntime*>&
 	}
 }
 
-bool UConfigForgeSubsystem::GetRuntimeCategories(const UConfigForgeFileRuntime* InConfigFile, TArray<UConfigForgeCategoryRuntime*>& OutCategories)
+bool UConfigForgeSubsystem::GetRuntimeCategories(const UConfigForgeFileRuntime* InConfigFile, TArray<UConfigForgeCategoryRuntime*>& OutCategories) const
 {
 	if (!InConfigFile)
 		return false;
@@ -247,7 +247,7 @@ bool UConfigForgeSubsystem::GetRuntimeCategories(const UConfigForgeFileRuntime* 
 	return OutCategories.Num() > 0;
 }
 
-bool UConfigForgeSubsystem::GetRuntimeCategories_ID(const FGuid& InFileId, TArray<UConfigForgeCategoryRuntime*>& OutCategories)
+bool UConfigForgeSubsystem::GetRuntimeCategories_ID(const FGuid& InFileId, TArray<UConfigForgeCategoryRuntime*>& OutCategories) const
 {
 	UConfigForgeFileRuntime* runtimeFile;
 	if (!GetRuntimeFile(InFileId, runtimeFile))
@@ -259,14 +259,14 @@ bool UConfigForgeSubsystem::GetRuntimeCategories_ID(const FGuid& InFileId, TArra
 	return GetRuntimeCategories(runtimeFile, OutCategories);
 }
 
-bool UConfigForgeSubsystem::GetRuntimeCategory(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory)
+bool UConfigForgeSubsystem::GetRuntimeCategory(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory) const
 {
 	if (!InConfigFile)
 		return false;
 	return InConfigFile->GetCategory(InCategoryName, OutCategory);
 }
 
-bool UConfigForgeSubsystem::GetRuntimeCategory_ID(const FGuid& InFileId, const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory)
+bool UConfigForgeSubsystem::GetRuntimeCategory_ID(const FGuid& InFileId, const FName& InCategoryName, UConfigForgeCategoryRuntime*& OutCategory) const
 {
 	UConfigForgeFileRuntime* runtimeFile;
 	if (!GetRuntimeFile(InFileId, runtimeFile))
@@ -278,7 +278,7 @@ bool UConfigForgeSubsystem::GetRuntimeCategory_ID(const FGuid& InFileId, const F
 	return GetRuntimeCategory(runtimeFile, InCategoryName, OutCategory);
 }
 
-bool UConfigForgeSubsystem::GetRuntimeField(const UConfigForgeCategoryRuntime* InRuntimeCategory, const FString& InKey, UConfigValueObjectRuntime*& OutField)
+bool UConfigForgeSubsystem::GetRuntimeField(const UConfigForgeCategoryRuntime* InRuntimeCategory, const FString& InKey, UConfigValueObjectRuntime*& OutField) const
 {
 	if (InRuntimeCategory == nullptr)
 		return false;
@@ -286,7 +286,7 @@ bool UConfigForgeSubsystem::GetRuntimeField(const UConfigForgeCategoryRuntime* I
 	return InRuntimeCategory->GetField(InKey, OutField);
 }
 
-bool UConfigForgeSubsystem::GetRuntimeField_File(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, const FString& InKey, UConfigValueObjectRuntime*& OutField)
+bool UConfigForgeSubsystem::GetRuntimeField_File(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, const FString& InKey, UConfigValueObjectRuntime*& OutField) const
 {
 	if (InConfigFile == nullptr)
 		return false;
@@ -298,7 +298,7 @@ bool UConfigForgeSubsystem::GetRuntimeField_File(const UConfigForgeFileRuntime* 
 	return GetRuntimeField(category, InKey, OutField);
 }
 
-bool UConfigForgeSubsystem::GetRuntimeField_ID(const FGuid& InFileID, const FName& InCategoryName, const FString& InKey, UConfigValueObjectRuntime*& OutField)
+bool UConfigForgeSubsystem::GetRuntimeField_ID(const FGuid& InFileID, const FName& InCategoryName, const FString& InKey, UConfigValueObjectRuntime*& OutField) const
 {
 	UConfigForgeFileRuntime* file;
 	if (!GetRuntimeFile(InFileID, file))
@@ -311,7 +311,7 @@ bool UConfigForgeSubsystem::GetRuntimeField_ID(const FGuid& InFileID, const FNam
 	return GetRuntimeField(category, InKey, OutField);
 }
 
-bool UConfigForgeSubsystem::GetRuntimeFields(const UConfigForgeCategoryRuntime* InRuntimeCategory, TArray<UConfigValueObjectRuntime*>& OutFields)
+bool UConfigForgeSubsystem::GetRuntimeFields(const UConfigForgeCategoryRuntime* InRuntimeCategory, TArray<UConfigValueObjectRuntime*>& OutFields) const
 {
 	if (InRuntimeCategory == nullptr)
 		return false;
@@ -320,7 +320,7 @@ bool UConfigForgeSubsystem::GetRuntimeFields(const UConfigForgeCategoryRuntime* 
 	return true;
 }
 
-bool UConfigForgeSubsystem::GetRuntimeFields_File(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, TArray<UConfigValueObjectRuntime*>& OutFields)
+bool UConfigForgeSubsystem::GetRuntimeFields_File(const UConfigForgeFileRuntime* InConfigFile, const FName& InCategoryName, TArray<UConfigValueObjectRuntime*>& OutFields) const
 {
 	if (InConfigFile == nullptr)
 		return false;
@@ -332,7 +332,7 @@ bool UConfigForgeSubsystem::GetRuntimeFields_File(const UConfigForgeFileRuntime*
 	return GetRuntimeFields(category, OutFields);
 }
 
-bool UConfigForgeSubsystem::GetRuntimeFields_ID(const FGuid& InFileID, const FName& InCategoryName, TArray<UConfigValueObjectRuntime*>& OutFields)
+bool UConfigForgeSubsystem::GetRuntimeFields_ID(const FGuid& InFileID, const FName& InCategoryName, TArray<UConfigValueObjectRuntime*>& OutFields) const
 {
 	UConfigForgeFileRuntime* file;
 	if (!GetRuntimeFile(InFileID, file))
@@ -343,6 +343,37 @@ bool UConfigForgeSubsystem::GetRuntimeFields_ID(const FGuid& InFileID, const FNa
 		return false;
 
 	return GetRuntimeFields(category, OutFields);
+}
+
+bool UConfigForgeSubsystem::GetRuntimeField_Full(
+	const FGuid& InFiledId,
+	const FName& InCategoryName,
+	const FString& InFieldName,
+	UConfigForgeFileRuntime*& OutFile,
+	UConfigForgeCategoryRuntime*& OutCategory,
+	UConfigValueObjectRuntime*& OutField) const
+{
+	OutFile = nullptr;
+	OutCategory = nullptr;
+	OutField = nullptr;
+
+	UConfigForgeFileRuntime* file;
+	if (!GetRuntimeFile(InFiledId, file))
+		return false;
+
+	UConfigForgeCategoryRuntime* category;
+	if (!GetRuntimeCategory(file, InCategoryName, category))
+		return false;
+
+	UConfigValueObjectRuntime* field;
+	if (!GetRuntimeField(category, InFieldName, field))
+		return false;
+
+	OutFile = file;
+	OutCategory = category;
+	OutField = field;
+	
+	return IsValid(OutFile) && IsValid(OutCategory) && OutField;
 }
 
 #pragma endregion
