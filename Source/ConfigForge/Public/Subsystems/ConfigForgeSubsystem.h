@@ -7,6 +7,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "ConfigForgeSubsystem.generated.h"
 
+class UConfigValueObjectRuntime;
 class UConfigForgeCategory;
 class UConfigForgeCategoryRuntime;
 class UConfigPathProvider;
@@ -21,6 +22,7 @@ class UConfigForgeDeveloperSettings;
 DECLARE_DELEGATE_TwoParams(FLoadForgeFileDelegate, bool, UConfigForgeFileRuntime*);
 DECLARE_DELEGATE_OneParam(FSaveForgeFileDelegate, bool);
 DECLARE_DELEGATE_TwoParams(FLoadAllForgeFileDelegate, bool, const TArray<UConfigForgeFileRuntime*>&);
+DECLARE_DELEGATE_TwoParams(FSaveSelectedForgeFileDelegate, bool, const TArray<UConfigForgeFileRuntime*>&);
 DECLARE_DELEGATE_OneParam(FSaveAllForgeFileDelegate, bool);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FConfigForgeSubsystemDelegate);
@@ -599,6 +601,12 @@ public:
 	 *       is invoked immediately with failure.
 	 */
 	void SaveAllFilesAsync(FSaveAllForgeFileDelegate Callback);
+
+	UFUNCTION(BlueprintCallable, Category="I/O")
+	bool SaveSelectedFiles(const TArray<FGuid>& InFiles);
+
+	void SaveSelectedFiles(const TArray<FGuid>& InFiles, FSaveSelectedForgeFileDelegate Callback);
+	
 	#pragma endregion
 
 public:

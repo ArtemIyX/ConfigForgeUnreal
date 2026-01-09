@@ -32,7 +32,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Category")
-	FORCEINLINE UConfigForgeFileRuntime* GetFile() { return File.Get(); }
+	FORCEINLINE UConfigForgeFileRuntime* GetFile() const { return File.Get(); }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Category")
 	FORCEINLINE FName GetCategoryName() const { return CategoryName; }

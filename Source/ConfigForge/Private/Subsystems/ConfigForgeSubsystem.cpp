@@ -824,4 +824,90 @@ void UConfigForgeSubsystem::SaveAllFilesAsync(FSaveAllForgeFileDelegate Callback
 
 }
 
+bool UConfigForgeSubsystem::SaveSelectedFiles(const TArray<FGuid>& InFiles)
+{
+	if (InFiles.Num() == 0)
+		return false;
+
+	if (bOperatingFiles)
+		return false;
+
+	TArray<UConfigForgeFileRuntime*> files;
+	int32 n = InFiles.Num();
+	files.Reserve(n);
+	for (int32 i = 0; i < n; ++i)
+	{
+		UConfigForgeFileRuntime* file;
+		if (GetRuntimeFile(InFiles[i], file))
+		{
+			files.Add(file);
+		}
+	}
+
+	if (files.Num() == 0)
+		return false;
+
+	bOperatingFiles = true;
+	const bool bSuccess = WriteAllFilesInternal(files);
+	bOperatingFiles = false;
+
+	n = files.Num();
+	for (int i = 0; i < n; ++i)
+	{
+		OnFileSaved.Broadcast(files[i]);
+	}
+
+	return bSuccess;
+}
+
+void UConfigForgeSubsystem::SaveSelectedFiles(const TArray<FGuid>& InFiles, FLoadAllForgeFileDelegate Callback)
+{
+	if (InFiles.Num() == 0)
+	{
+		Callback.ExecuteIfBound(false, {});
+		return;
+	}
+
+	if (bOperatingFiles)
+	{
+		Callback.ExecuteIfBound(false, {});
+		return;
+	}
+
+	TArray<UConfigForgeFileRuntime*> files;
+	int32 n = InFiles.Num();
+	files.Reserve(n);
+	for (int32 i = 0; i < n; ++i)
+	{
+		UConfigForgeFileRuntime* file;
+		if (GetRuntimeFile(InFiles[i], file))
+		{
+			files.Add(file);
+		}
+	}
+
+	if (files.Num() == 0)
+	{
+		Callback.ExecuteIfBound(false, {});
+		return;
+	}
+
+	bOperatingFiles = true;
+	Async(EAsyncExecution::TaskGraph, [this, files, Callback]() {
+		const bool bSuccess = WriteAllFilesInternal(files);
+		AsyncTask(ENamedThreads::GameThread, [this, bSuccess, files, Callback]() {
+			bOperatingFiles = false;
+
+			const int32 n = files.Num();
+			for (int i = 0; i < n; ++i)
+			{
+				OnFileSaved.Broadcast(files[i]);
+			}
+
+			Callback.ExecuteIfBound(bSuccess, files);
+		});
+	});
+
+}
+
 #pragma endregion

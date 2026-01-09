@@ -1,20 +1,18 @@
 ﻿// © Artem Podorozhko. All Rights Reserved. This project, including all associated assets, code, and content, is the property of Artem Podorozhko. Unauthorized use, distribution, or modification is strictly prohibited.
 
 
-#include "K2/ConfigForgeAsyncSaveSelectedFilesNode.h"
-
+#include "K2/ConfigForgeAsyncLoadSelectedFilesNode.h"
 #include "Subsystems/ConfigForgeSubsystem.h"
 
-
-UConfigForgeAsyncSaveSelectedFilesNode* UConfigForgeAsyncSaveSelectedFilesNode::SaveConfigForgeSelectedFilesAsync(UObject* WorldContextObject, const TArray<FGuid>& InFiles)
+UConfigForgeAsyncLoadSelectedFilesNode* UConfigForgeAsyncLoadSelectedFilesNode::LoadConfigForgeSelectedFilesAsync(UObject* WorldContextObject, const TArray<FConfigForgeFileData>& InFiles)
 {
-	UConfigForgeAsyncSaveSelectedFilesNode* node = NewObject<UConfigForgeAsyncSaveSelectedFilesNode>();
+	UConfigForgeAsyncLoadSelectedFilesNode* node = NewObject<UConfigForgeAsyncLoadSelectedFilesNode>();
 	node->WorldContextObject = WorldContextObject;
-	node->FilesToSave = InFiles;
+	node->Files = InFiles;
 	return node;
 }
 
-void UConfigForgeAsyncSaveSelectedFilesNode::Activate()
+void UConfigForgeAsyncLoadSelectedFilesNode::Activate()
 {
 	if (!WorldContextObject.IsValid())
 	{
@@ -41,14 +39,14 @@ void UConfigForgeAsyncSaveSelectedFilesNode::Activate()
 	}
 
 	// Create delegate for callback
-	FSaveSelectedForgeFileDelegate callback;
-	callback.BindUObject(this, &UConfigForgeAsyncSaveSelectedFilesNode::OnSaveComplete);
+	FLoadAllForgeFileDelegate callback;
+	callback.BindUObject(this, &UConfigForgeAsyncLoadSelectedFilesNode::OnLoadComplete);
 
 	// Start async load
-	configForgeSubsystem->SaveSelectedFiles(FilesToSave, callback);
+	configForgeSubsystem->LoadSelectedFilesAsync(Files, callback);
 }
 
-void UConfigForgeAsyncSaveSelectedFilesNode::OnSaveComplete(bool bSuccess, const TArray<UConfigForgeFileRuntime*>& InFiles)
+void UConfigForgeAsyncLoadSelectedFilesNode::OnLoadComplete(bool bSuccess, const TArray<UConfigForgeFileRuntime*>& InFiles)
 {
 	OnFinished.Broadcast(InFiles, bSuccess);
 	SetReadyToDestroy();
